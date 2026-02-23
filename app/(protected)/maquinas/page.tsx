@@ -3,6 +3,8 @@ import { MachineCard } from '@/components/machine-card'
 import { MachineFormDialog } from '@/components/machine-form-dialog'
 import { Printer } from 'lucide-react'
 
+export const metadata = { title: 'Maquinas' }
+
 export default async function MaquinasPage() {
   const supabase = await createClient()
   const { data: machines } = await supabase

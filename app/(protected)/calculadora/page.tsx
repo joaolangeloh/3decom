@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { CalculatorForm } from '@/components/calculator/calculator-form'
 
+export const metadata = { title: 'Calculadora' }
+
 export default async function CalculadoraPage() {
   const supabase = await createClient()
 

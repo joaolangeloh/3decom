@@ -2,6 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { HistoryTable } from '@/components/history-table'
 import { History } from 'lucide-react'
 
+export const metadata = { title: 'Historico' }
+
 export default async function HistoricoPage() {
   const supabase = await createClient()
 

@@ -3,6 +3,8 @@ import { MaterialCard } from '@/components/material-card'
 import { MaterialFormDialog } from '@/components/material-form-dialog'
 import { Package } from 'lucide-react'
 
+export const metadata = { title: 'Materiais' }
+
 export default async function MateriaisPage() {
   const supabase = await createClient()
   const { data: materials } = await supabase

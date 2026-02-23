@@ -12,6 +12,8 @@ import { Button } from '@/components/ui/button'
 import { CheckCircle2 } from 'lucide-react'
 import { ReloadButton } from './reload-button'
 
+export const metadata = { title: 'Assinar' }
+
 export default async function AssinarPage() {
   const supabase = await createClient()
   const {

@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { Calculator, Package, Printer, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+export const metadata = { title: 'Dashboard' }
+
 export default async function DashboardPage() {
   const supabase = await createClient()
 
