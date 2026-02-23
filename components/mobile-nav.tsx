@@ -5,17 +5,15 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Calculator,
-  Package,
-  Printer,
   History,
+  Settings,
 } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/calculadora', label: 'Calcular', icon: Calculator },
-  { href: '/materiais', label: 'Materiais', icon: Package },
-  { href: '/maquinas', label: 'Maquinas', icon: Printer },
+  { href: '/calculadora', label: 'Precificar', icon: Calculator },
   { href: '/historico', label: 'Historico', icon: History },
+  { href: '/preferencias', label: 'Prefs', icon: Settings },
 ]
 
 interface MobileNavProps {

@@ -9,7 +9,7 @@ export default async function HistoricoPage() {
 
   const { data: calculations } = await supabase
     .from('calculations')
-    .select('*, materials(name), machines(name)')
+    .select('*')
     .order('created_at', { ascending: false })
 
   return (

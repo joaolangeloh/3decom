@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { Calculator, Package, Printer, ArrowRight } from 'lucide-react'
+import { Calculator, ArrowRight, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const metadata = { title: 'Dashboard' }
@@ -16,8 +16,6 @@ export default async function DashboardPage() {
     { data: profile },
     { data: subscription },
     { data: calculations },
-    { data: materials },
-    { data: machines },
     { count: totalCalculations },
   ] = await Promise.all([
     supabase
@@ -35,31 +33,11 @@ export default async function DashboardPage() {
       .select('*')
       .order('created_at', { ascending: false })
       .limit(5),
-    supabase.from('materials').select('id'),
-    supabase.from('machines').select('id'),
     supabase.from('calculations').select('*', { count: 'exact', head: true }),
   ])
 
   const firstName = profile?.name?.split(' ')[0] || 'usuario'
   const isActive = subscription?.status === 'active'
-
-  const stats = [
-    {
-      label: 'Total de Calculos',
-      value: totalCalculations ?? 0,
-      icon: Calculator,
-    },
-    {
-      label: 'Materiais Cadastrados',
-      value: materials?.length ?? 0,
-      icon: Package,
-    },
-    {
-      label: 'Maquinas Cadastradas',
-      value: machines?.length ?? 0,
-      icon: Printer,
-    },
-  ]
 
   return (
     <div className="space-y-8">
@@ -75,49 +53,41 @@ export default async function DashboardPage() {
         </p>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-card border border-border rounded-xl p-6 flex items-start gap-4"
-          >
-            <div className="flex items-center justify-center size-11 rounded-lg bg-accent/10 shrink-0">
-              <stat.icon className="size-5 text-accent" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="font-mono text-sm text-muted-foreground mt-0.5">
-                {stat.label}
-              </p>
-            </div>
+      {/* Stats */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="bg-card border border-border rounded-xl p-6 flex items-start gap-4">
+          <div className="flex items-center justify-center size-11 rounded-lg bg-accent/10 shrink-0">
+            <Calculator className="size-5 text-accent" />
           </div>
-        ))}
+          <div>
+            <p className="text-3xl font-bold">{totalCalculations ?? 0}</p>
+            <p className="font-mono text-sm text-muted-foreground mt-0.5">
+              Precificações realizadas
+            </p>
+          </div>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-6 flex items-start gap-4">
+          <div className="flex items-center justify-center size-11 rounded-lg bg-accent/10 shrink-0">
+            <History className="size-5 text-accent" />
+          </div>
+          <div>
+            <p className="text-3xl font-bold">2026</p>
+            <p className="font-mono text-sm text-muted-foreground mt-0.5">
+              Taxas atualizadas
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Quick actions */}
       <div>
         <h2 className="text-lg font-semibold mb-4">Acoes rapidas</h2>
-        <div className="flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href="/calculadora">
-              <Calculator className="size-4" />
-              Nova Precificacao
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/materiais">
-              <Package className="size-4" />
-              Adicionar Material
-            </Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/maquinas">
-              <Printer className="size-4" />
-              Adicionar Maquina
-            </Link>
-          </Button>
-        </div>
+        <Button asChild size="lg">
+          <Link href="/calculadora">
+            <Calculator className="size-4" />
+            Nova Precificação
+          </Link>
+        </Button>
       </div>
 
       {/* Recent calculations */}
@@ -126,7 +96,7 @@ export default async function DashboardPage() {
         {!calculations || calculations.length === 0 ? (
           <div className="bg-card border border-border rounded-xl p-8 text-center">
             <p className="text-muted-foreground text-sm">
-              Nenhum calculo ainda. Comece usando a calculadora.
+              Nenhum calculo ainda. Comece usando a precificadora.
             </p>
           </div>
         ) : (
@@ -146,6 +116,15 @@ export default async function DashboardPage() {
                           year: 'numeric',
                         })
                       : '\u2014'}
+                    {calc.marketplace && (
+                      <span className="ml-2 text-accent">
+                        {calc.marketplace === 'mercadolivre'
+                          ? 'ML'
+                          : calc.marketplace === 'shopee'
+                            ? 'Shopee'
+                            : calc.marketplace}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <p className="font-mono text-accent font-semibold shrink-0 ml-4">

@@ -5,9 +5,8 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Calculator,
-  Package,
-  Printer,
   History,
+  Settings,
   LogOut,
 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
@@ -15,10 +14,9 @@ import { Button } from '@/components/ui/button'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/calculadora', label: 'Calculadora', icon: Calculator },
-  { href: '/materiais', label: 'Materiais', icon: Package },
-  { href: '/maquinas', label: 'Maquinas', icon: Printer },
+  { href: '/calculadora', label: 'Precificadora', icon: Calculator },
   { href: '/historico', label: 'Historico', icon: History },
+  { href: '/preferencias', label: 'Preferencias', icon: Settings },
 ]
 
 interface SidebarProps {
