@@ -1,21 +1,36 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import SessionWrapper from '@/components/SessionWrapper'
+import type { Metadata } from "next";
+import { Inter, DM_Mono } from "next/font/google";
+import "./globals.css";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const dmMono = DM_Mono({
+  variable: "--font-dm-mono",
+  weight: ["300", "400", "500"],
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: '3DEcom — Precificadora para impressão 3D',
-  description: 'Precifique suas peças 3D com precisão. Mercado Livre, Shopee e venda direta.',
-}
+  title: "3DEcom - Precificadora 3D",
+  description:
+    "Calculadora de precificacao para impressao 3D. Gerencie materiais, maquinas e calcule precos com precisao.",
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <html lang="pt-BR">
-      <body className={inter.className}>
-        <SessionWrapper>{children}</SessionWrapper>
+    <html lang="pt-BR" className="dark">
+      <body
+        className={`${inter.variable} ${dmMono.variable} font-sans antialiased`}
+      >
+        {children}
       </body>
     </html>
-  )
+  );
 }

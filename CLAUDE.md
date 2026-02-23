@@ -1,80 +1,34 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
-
-**3DEcom** is a SaaS web app for 3D printing price calculation. Users subscribe (via Lastlink payment) to access a pricing calculator hosted as a static HTML page served in an iframe.
+**3DEcom** is a SaaS web app for 3D printing price calculation. Users subscribe (R$29/mes via Lastlink) to access a pricing calculator, material/machine management, and calculation history.
 
 ## Commands
-
 ```bash
-npm run dev      # Start dev server on http://localhost:3000
+npm run dev      # Start dev server (Turbopack)
 npm run build    # Production build
 npm start        # Start production server
 ```
 
-No test or lint scripts are configured.
-
 ## Architecture
+**Stack:** Next.js 15 (App Router) · TypeScript · Supabase Auth · Supabase PostgreSQL + RLS · @supabase/ssr · Tailwind CSS 4 · shadcn/ui · Lastlink payments · Vercel
 
-**Stack:** Next.js 14 (App Router) · TypeScript · NextAuth.js 4 (JWT/credentials) · Supabase (PostgreSQL) · Tailwind CSS · Lastlink payments · Deployed on Vercel
-
-### User Flow
-
-1. Unauthenticated → `/landing` (static HTML in iframe at `/public/landing.html`)
-2. Register at `/auth/cadastro` → auto-login → `/assinar` (subscription page)
-3. Payment via Lastlink → webhook activates subscription → `/dashboard`
-4. Dashboard renders `/public/precificadora.html` in iframe (the actual calculator)
-
-### Route Protection
-
-`middleware.ts` protects `/dashboard/*` and `/app/*`: requires valid NextAuth JWT **and** `subscriptionStatus === 'active'`, otherwise redirects to `/assinar`.
-
-### Key Files
-
-| File | Purpose |
-|------|---------|
-| `lib/auth.ts` | NextAuth config — credentials provider, JWT/session callbacks, subscription status fetched at login |
-| `lib/supabase.ts` | Supabase admin client (service role) |
-| `app/api/register/route.ts` | Registration: validates (Zod), bcrypt hash (12 rounds), creates user + inactive subscription |
-| `app/api/webhook/lastlink/route.ts` | Payment webhook: validates `x-lastlink-token` header, updates subscription status |
-| `middleware.ts` | Route protection via `withAuth()` |
-| `supabase-schema.sql` | DB schema (users + subscriptions tables) |
-| `public/precificadora.html` | The 3D print calculator (served via iframe in dashboard) |
-
-### Database Schema
-
-Two tables in Supabase:
-- `users` — id (uuid), name, email (unique), password_hash, created_at
-- `subscriptions` — id, user_id (FK → users, cascade delete), status (`active|inactive|canceled`), lastlink_subscription_id, current_period_end, timestamps
-
-### Subscription Status Logic
-
-Webhook events mapping in `/api/webhook/lastlink`:
-- `paid | active | approved | created` → status `active`, expires in 30 days
-- `cancel | expired | chargeback` → status `canceled`
+### Key Directories
+- `app/` — Next.js App Router pages and API routes
+- `app/(protected)/` — Routes requiring auth + active subscription
+- `components/` — React components (ui/ for shadcn, others for app-specific)
+- `lib/` — Utilities (supabase clients, calculator logic, types)
+- `lib/supabase/` — Supabase client utilities (client.ts, server.ts, admin.ts, middleware.ts)
 
 ### Environment Variables
+- `NEXT_PUBLIC_SUPABASE_URL` — Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase anon/publishable key
+- `SUPABASE_SERVICE_ROLE_KEY` — Supabase admin key (server-only, for webhook)
+- `LASTLINK_WEBHOOK_TOKEN` — Validates incoming Lastlink webhooks
+- `NEXT_PUBLIC_LASTLINK_URL` — Lastlink checkout URL
 
-```
-NEXT_PUBLIC_SUPABASE_URL        # Supabase project URL
-SUPABASE_SERVICE_ROLE_KEY       # Supabase admin key (server-only)
-NEXTAUTH_URL                    # App URL (e.g. https://yourdomain.com)
-NEXTAUTH_SECRET                 # Random secret for JWT signing
-LASTLINK_WEBHOOK_TOKEN          # Validates incoming Lastlink webhook calls
-NEXT_PUBLIC_LASTLINK_URL        # Lastlink checkout URL (public)
-```
-
-### Styling Conventions
-
-- Dark theme: `#080810` / `#0e0e1a` backgrounds
-- Accent: `#00e5a0` (cyan/teal)
-- Mix of Tailwind classes and inline styles
-- Font: Inter (Google Fonts, loaded in root layout)
-
-### TypeScript Notes
-
-- NextAuth types extended in `types/next-auth.d.ts` (adds `id` and `subscriptionStatus` to Session/JWT)
-- Server components by default; `'use client'` only for interactive pages (login, cadastro, assinar)
-- Path alias `@/*` maps to project root
+### Design System
+- Dark theme always: `#080810` bg, `#0e0e1a` surface, `#00e5a0` accent
+- Fonts: Inter + DM Mono
+- UI: shadcn/ui (New York style) customized with dark theme
+- Path alias: `@/*` maps to project root
