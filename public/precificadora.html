@@ -1,0 +1,2172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3DEcom — Precificadora 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080810; --surface:#0f0f1a; --card:#13131f; --card2:#1a1a2a;
+  --border:#252538; --border2:#303050;
+  --accent:#00e5a0; --accent-dim:rgba(0,229,160,0.08); --accent-glow:rgba(0,229,160,0.15);
+  --meli:#ffe600; --meli-dim:rgba(255,230,0,0.08);
+  --shopee:#ff5126; --shopee-dim:rgba(255,81,38,0.08);
+  --text:#ededf8; --text2:#a0a0c0; --muted:#555578;
+  --success:#00e5a0; --warn:#ffb020; --danger:#ff3f5e; --promo:#c084fc;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(0,229,160,.03) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(255,81,38,.03) 0%,transparent 60%);pointer-events:none;z-index:0}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 20px 120px;position:relative}
+
+/* HEADER */
+header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:40px;gap:16px;flex-wrap:wrap}
+.logo-eyebrow{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.logo-main{font-size:clamp(28px,6vw,46px);font-weight:800;letter-spacing:-2px;line-height:1}
+.logo-main em{color:var(--accent);font-style:normal}
+.logo-sub{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border2);border-radius:30px;padding:7px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:5px;margin-bottom:24px}
+.tab{flex:1;padding:10px 16px;border:none;border-radius:10px;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--muted);background:transparent;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.tab.active{background:var(--card2);color:var(--text);border:1px solid var(--border2)}
+.tab-dot{width:8px;height:8px;border-radius:50%}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 400px;gap:16px;align-items:start}
+@media(max-width:820px){.layout{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:14px}
+.card.prefs{border-color:rgba(0,229,160,0.2);background:linear-gradient(135deg,rgba(0,229,160,.04),var(--card))}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.cn{width:24px;height:24px;border-radius:7px;background:var(--accent-dim);border:1px solid rgba(0,229,160,.25);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);flex-shrink:0}
+.ch h2{font-size:14px;font-weight:700;letter-spacing:-.3px}
+.chtag{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);background:var(--surface);padding:3px 8px;border-radius:20px;border:1px solid var(--border)}
+
+/* FORM */
+.fg{display:grid;gap:11px}
+.fg.c2{grid-template-columns:1fr 1fr}
+.fg.c3{grid-template-columns:1fr 1fr 1fr}
+.fg.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:500px){.fg.c2,.fg.c3,.fg.c4{grid-template-columns:1fr 1fr}}
+.s2{grid-column:1/-1}
+.f{display:flex;flex-direction:column;gap:6px}
+label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.iw{position:relative}
+input[type=number],input[type=text],select{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 13px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;outline:none;width:100%;appearance:none;-webkit-appearance:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.pfx{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);pointer-events:none}
+.sfx{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);pointer-events:none}
+.iw input{padding-left:36px}
+.iw.sr input{padding-left:13px;padding-right:42px}
+.hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);line-height:1.5}
+select option{background:#1a1a28}
+
+/* TIME INPUT */
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* MP TABS */
+.mp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.mpt{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;text-align:left}
+.mpt::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.mpt.meli::after{background:linear-gradient(135deg,var(--meli-dim),transparent 60%)}
+.mpt.shopee::after{background:linear-gradient(135deg,var(--shopee-dim),transparent 60%)}
+.mpt:hover::after,.mpt.active::after{opacity:1}
+.mpt.meli.active{border-color:var(--meli)}
+.mpt.shopee.active{border-color:var(--shopee)}
+.mpt:hover{transform:translateY(-2px)}
+.mpico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;z-index:1}
+.meli .mpico{background:rgba(255,230,0,.1)}
+.shopee .mpico{background:rgba(255,81,38,.1)}
+.mpl{position:relative;z-index:1}
+.mpl strong{display:block;font-size:13px;font-weight:700}
+.mpl small{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.mprad{margin-left:auto;flex-shrink:0;width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;position:relative;z-index:1;transition:all .2s}
+.mpt.meli.active .mprad{background:var(--meli);border-color:var(--meli);color:#000}
+.mpt.shopee.active .mprad{background:var(--shopee);border-color:var(--shopee);color:#fff}
+
+/* OPT BTNS */
+.og{display:grid;gap:8px;margin-bottom:12px}
+.og.c2{grid-template-columns:1fr 1fr}
+.ob{background:var(--surface);border:2px solid var(--border);border-radius:11px;padding:12px 14px;cursor:pointer;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:600;text-align:left;transition:all .15s}
+.ob small{display:block;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);font-weight:400;margin-top:2px}
+.ob.am{border-color:var(--meli);background:var(--meli-dim)}
+.ob.as{border-color:var(--shopee);background:var(--shopee-dim)}
+.ob.ag{border-color:var(--accent);background:var(--accent-dim)}
+
+/* TOGGLE */
+.tr{display:flex;align-items:center;justify-content:space-between;padding:9px 0;gap:12px}
+.tl{font-size:13px;color:var(--text2)}
+.ts{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);display:block;margin-top:2px}
+.tg{position:relative;width:42px;height:23px;background:var(--border2);border-radius:12px;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tg.on{background:var(--accent)}
+.tg::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg.on::after{transform:translateX(19px)}
+
+/* MARGIN SLIDER */
+.slider-wrap{padding:4px 0}
+.slider{width:100%;height:6px;border-radius:3px;appearance:none;-webkit-appearance:none;background:linear-gradient(to right,var(--accent) 0%,var(--accent) var(--val,30%),var(--border2) var(--val,30%),var(--border2) 100%);cursor:pointer;outline:none;border:none}
+.slider::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid var(--bg);box-shadow:0 2px 8px rgba(0,229,160,.3);cursor:pointer}
+.slider-labels{display:flex;justify-content:space-between;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px}
+
+/* PROMO BADGE */
+.promo-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.3);border-radius:20px;padding:5px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--promo);margin-top:8px}
+
+/* CALC BTN */
+.cbtn{width:100%;background:linear-gradient(135deg,var(--accent),#00c87a);border:none;border-radius:13px;padding:17px;color:#000;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:-.3px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px}
+.cbtn:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(0,229,160,.25)}
+.cbtn:active{transform:none}
+
+/* RIGHT PANEL */
+.rp{position:sticky;top:20px}
+.empty-state{background:var(--card);border:1px dashed var(--border2);border-radius:20px;padding:40px 24px;text-align:center}
+.empty-ico{font-size:36px;margin-bottom:12px}
+.empty-state p{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);line-height:1.7}
+#rp{display:none;animation:su .4s cubic-bezier(.16,1,.3,1)}
+@keyframes su{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* RESULT HERO */
+.rhero{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:22px;margin-bottom:12px}
+.rheader{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.rmbadge{font-family:'DM Mono',monospace;font-size:10px;padding:4px 10px;border-radius:20px}
+.rmbadge.meli{background:var(--meli-dim);color:var(--meli);border:1px solid rgba(255,230,0,.2)}
+.rmbadge.shopee{background:var(--shopee-dim);color:var(--shopee);border:1px solid rgba(255,81,38,.2)}
+.mbig{text-align:center;padding:14px 0 18px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.mbigl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.mbigv{font-size:clamp(28px,6vw,40px);font-weight:800;letter-spacing:-2px;line-height:1}
+.mbigs{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:5px}
+.profit{color:var(--success)}
+.loss{color:var(--danger)}
+.neutral{color:var(--text)}
+.warnc{color:var(--warn)}
+.promoc{color:var(--promo)}
+
+/* METRICS GRID */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.msm{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px}
+.msml{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.msmv{font-size:16px;font-weight:700;letter-spacing:-.5px}
+
+/* PROMO BOX */
+.promo-box{background:rgba(192,132,252,.06);border:1px solid rgba(192,132,252,.2);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.promo-box-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--promo);margin-bottom:12px}
+.promo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.promo-label{font-size:13px;color:var(--text2)}
+.promo-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:600;color:var(--promo)}
+.promo-price{font-size:22px;font-weight:800;color:var(--promo);letter-spacing:-1px}
+.promo-margin{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px}
+
+/* BAR */
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px 18px;margin-bottom:12px}
+.btitle{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:11px}
+.sbar{display:flex;height:9px;border-radius:5px;overflow:hidden;gap:2px;margin-bottom:9px}
+.seg{transition:flex .4s ease;border-radius:3px;min-width:0}
+.se{background:#4488ff}.sf{background:#ff88aa}.st{background:#ffb020}.sfr{background:#aa88ff}.si{background:#ff6666}.sx{background:#888}.sp{background:var(--accent)}
+.sleg{display:flex;flex-wrap:wrap;gap:7px}
+.sli{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:10px;color:var(--text2)}
+.sld{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* BREAKDOWN CASCATA */
+.dcard{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:16px 18px;margin-bottom:12px}
+.dtitle{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+
+/* Linha de topo: preço de venda */
+.casc-top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;margin-bottom:6px}
+.casc-top-label{font-size:13px;font-weight:700;color:var(--text)}
+.casc-top-val{font-family:'DM Mono',monospace;font-size:16px;font-weight:800;color:var(--text);letter-spacing:-.5px}
+
+/* Cada linha de desconto */
+.casc-row{display:flex;align-items:center;gap:0;margin-bottom:2px;position:relative}
+.casc-connector{width:18px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;self-align:stretch}
+.casc-line{width:2px;background:var(--border2);flex:1;min-height:100%;margin:0 auto}
+.casc-arrow{width:10px;height:10px;border-left:2px solid var(--border2);border-bottom:2px solid var(--border2);transform:rotate(-45deg) translateX(2px);margin-top:-4px;flex-shrink:0}
+.casc-body{flex:1;display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:9px;border:1px solid var(--border);background:var(--surface)}
+.casc-left{display:flex;align-items:center;gap:8px}
+.casc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.casc-name{font-size:12px;color:var(--text2)}
+.casc-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.casc-minus{font-family:'DM Mono',monospace;font-size:12px;color:var(--danger)}
+.casc-running{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+
+/* Linha de acumulado intermediário */
+.casc-subtotal{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;border-radius:8px;background:rgba(255,63,94,.06);border:1px dashed rgba(255,63,94,.2);margin:4px 0 4px 18px}
+.casc-subtotal-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.casc-subtotal-val{font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:var(--danger)}
+
+/* Linha final de lucro */
+.casc-result{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;margin-top:6px;border:2px solid}
+.casc-result.profit{border-color:rgba(0,229,160,.35);background:rgba(0,229,160,.07)}
+.casc-result.loss{border-color:rgba(255,63,94,.35);background:rgba(255,63,94,.07)}
+.casc-result-label{font-size:13px;font-weight:700;color:var(--text)}
+.casc-result-val{font-family:'DM Mono',monospace;font-size:18px;font-weight:800;letter-spacing:-.5px}
+.casc-result-pct{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px;text-align:right}
+
+/* CAPACIDADE */
+.capcard{background:linear-gradient(135deg,rgba(0,229,160,.06),var(--card));border:1px solid rgba(0,229,160,.2);border-radius:15px;padding:16px 18px;margin-bottom:12px}
+.capgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.capm{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center}
+.capml{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.capmv{font-size:18px;font-weight:800;letter-spacing:-.5px;color:var(--accent)}
+.capms{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ALERTS */
+.al{padding:12px 15px;border-radius:11px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.6;margin-bottom:10px;display:none}
+.al.warn{background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.25);color:var(--warn)}
+.al.danger{background:rgba(255,63,94,.08);border:1px solid rgba(255,63,94,.25);color:var(--danger)}
+.al.info{background:var(--accent-dim);border:1px solid rgba(0,229,160,.2);color:var(--accent)}
+
+hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+
+/* PREFS PANEL */
+#pref-panel{}
+.pref-saved{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);opacity:0;transition:opacity .4s;margin-left:8px}
+
+#mp-section,#shopee-section{display:none}
+
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <div class="logo-eyebrow">Precificadora · Impressão 3D · E-commerce</div>
+    <div class="logo-main">3D<em>Ecom</em></div>
+    <div class="logo-sub">Taxas reais 2026 · Shopee & Mercado Livre</div>
+  </div>
+  <div class="badge"><span class="bdot"></span>v2.0 · 2026</div>
+</header>
+
+<!-- MAIN TABS -->
+<div class="tabs">
+  <button class="tab active" id="tab-calc" onclick="window.showTab&&window.showTab('calc')">
+    <span>⚡</span> Precificar
+  </button>
+  <button class="tab" id="tab-hist" onclick="window.showTab&&window.showTab('hist')">
+    <span>📋</span> Histórico
+  </button>
+  <button class="tab" id="tab-pref" onclick="window.showTab&&window.showTab('pref')">
+    <span>⚙️</span> Preferências
+  </button>
+</div>
+
+<!-- ===================== CALC TAB ===================== -->
+<div id="calc-panel">
+<div class="layout">
+<!-- LEFT -->
+<div>
+
+  <!-- TIPO DE PRODUTO -->
+  <div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,rgba(0,229,160,.04),var(--card));border-color:rgba(0,229,160,.25)">
+    <div class="ch" style="margin-bottom:12px"><div class="cn">🏷️</div><h2>Tipo de produto</h2></div>
+    <div class="og c2">
+      <button class="ob" id="btn-tipo-3d" onclick="selectTipo('3d')">
+        🖨️ Produto 3D
+        <small>Impressora, filamento, energia</small>
+      </button>
+      <button class="ob" id="btn-tipo-normal" onclick="selectTipo('normal')">
+        📦 Produto Normal
+        <small>Comprado de fornecedor</small>
+      </button>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE -->
+  <div class="card">
+    <div class="ch"><div class="cn">01</div><h2>Marketplace</h2></div>
+    <div class="mp-grid" style="grid-template-columns:1fr 1fr 1fr">
+      <div class="mpt meli" id="tab-meli" onclick="selectMP('meli')">
+        <div class="mpico">🛒</div>
+        <div class="mpl"><strong>Mercado Livre</strong><small>Clássico ou Premium</small></div>
+        <div class="mprad" id="r-meli"></div>
+      </div>
+      <div class="mpt shopee" id="tab-shopee" onclick="selectMP('shopee')">
+        <div class="mpico">🧡</div>
+        <div class="mpl"><strong>Shopee</strong><small>Tabela oficial 2026</small></div>
+        <div class="mprad" id="r-shopee"></div>
+      </div>
+      <div class="mpt" id="tab-direto" onclick="selectMP('direto')" style="cursor:pointer">
+        <div class="mpico">🤝</div>
+        <div class="mpl"><strong>Venda Direta</strong><small>Pix, cartão, personalizado</small></div>
+        <div class="mprad" id="r-direto"></div>
+      </div>
+    </div>
+
+    <!-- ML -->
+    <div id="mp-section">
+      <label style="display:block;margin-bottom:8px">Tipo de anúncio</label>
+      <div class="og c2">
+        <button class="ob am" id="btn-classico" onclick="selectAnuncio('classico')">Clássico<small>10–14% · sem parcelamento</small></button>
+        <button class="ob" id="btn-premium" onclick="selectAnuncio('premium')">Premium<small>15–19% · até 10x sem juros</small></button>
+      </div>
+      <div class="f" style="margin-top:12px">
+        <label>Categoria (Clássico% / Premium%)</label>
+        <select id="ml-cat" onchange="onCatChange()">
+          <option value="12.5|17.5">Casa, Móveis e Decoração — 12,5% / 17,5%</option>
+          <option value="12.5|17.5">Utilidades Domésticas — 12,5% / 17,5%</option>
+          <option value="11.5|16.5">Acessórios para Veículos — 11,5% / 16,5%</option>
+          <option value="12|17">Ferramentas e Construção — 12% / 17%</option>
+          <option value="11|16">Games — 11% / 16%</option>
+          <option value="12|17">Festas e Lembrancinhas — 12% / 17%</option>
+          <option value="12.5|17.5">Brinquedos e Hobbies — 12,5% / 17,5%</option>
+          <option value="11.5|16.5">Eletrônicos — 11,5% / 16,5%</option>
+          <option value="custom">Outra categoria</option>
+        </select>
+      </div>
+      <!-- Taxa custom — sempre visível quando "Outra categoria", editável -->
+      <div id="ml-custom-wrap" style="display:none;margin-top:10px;padding:14px;background:var(--surface);border-radius:12px;border:1px solid var(--border)">
+        <p class="hint" style="margin-bottom:10px">Digite as taxas da sua categoria. Sem preencher não será possível calcular.</p>
+        <div class="fg c2">
+          <div class="f"><label>% Clássico</label><div class="iw sr"><input type="number" id="ml-tc" placeholder="—" min="0" max="100" step="0.1" oninput="calc()"><span class="sfx">%</span></div></div>
+          <div class="f"><label>% Premium</label><div class="iw sr"><input type="number" id="ml-tp" placeholder="—" min="0" max="100" step="0.1" oninput="calc()"><span class="sfx">%</span></div></div>
+        </div>
+      </div>
+      <div class="tr" id="ml-parcel-row" style="display:none">
+        <div><span class="tl">Taxa antecipação parcelamento?</span><small class="ts">Premium 10x: ML cobra ~2,99%</small></div>
+        <div class="tg" id="t-parcel" onclick="togParcel()"></div>
+      </div>
+
+      <!-- FRETE ML por peso -->
+      <div style="margin-top:14px;padding:14px;background:var(--surface);border-radius:12px;border:1px solid var(--border)">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🚚 Custo de envio (Envios ML 2026)</div>
+        <div class="fg c2">
+          <div class="f">
+            <label>Peso do produto com embalagem</label>
+            <div class="iw sr"><input type="number" id="ml-peso" placeholder="0,3" min="0" step="0.1" oninput="calc()"><span class="sfx">kg</span></div>
+            <p class="hint">Peso da peça + embalagem para envio</p>
+          </div>
+          <div class="f">
+            <label>Frete calculado (tabela oficial)</label>
+            <div style="background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:11px 13px">
+              <div style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;color:var(--warn)" id="ml-frete-display">—</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px" id="ml-frete-info">Informe o peso acima</div>
+            </div>
+          </div>
+        </div>
+        <div class="tr" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+          <div><span class="tl">Frete grátis e rápido (abaixo de R$79)?</span><small class="ts">Custo adicional para oferecer entrega rápida</small></div>
+          <div class="tg" id="t-ml-rapido" onclick="togMLRapido()"></div>
+        </div>
+        <div class="tr">
+          <div><span class="tl">Envio pelos Correios?</span><small class="ts">PAC, SEDEX, Mini Envios — você define o custo</small></div>
+          <div class="tg" id="t-ml-correios" onclick="togMLCorreios()"></div>
+        </div>
+        <div id="wrap-ml-correios" style="display:none;margin-top:10px">
+          <div class="f">
+            <label>Custo do frete Correios (R$)</label>
+            <div class="iw"><span class="pfx">R$</span><input type="number" id="ml-frete-correios" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+            <p class="hint">PAC, SEDEX, Mini Envios — informe o valor cobrado pelos Correios</p>
+          </div>
+        </div>
+        <div class="tr">
+          <div><span class="tl">Não sei o peso — digitar frete manualmente</span><small class="ts">Substitui o cálculo automático</small></div>
+          <div class="tg" id="t-ml-frete-manual" onclick="togMLFreteManual()"></div>
+        </div>
+        <div id="wrap-ml-frete-manual" style="display:none;margin-top:10px">
+          <div class="f">
+            <label>Custo de envio manual (R$)</label>
+            <div class="iw"><span class="pfx">R$</span><input type="number" id="ml-frete-manual" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOPEE -->
+    <div id="shopee-section">
+      <label style="display:block;margin-bottom:8px">Tipo de conta</label>
+      <div class="og c2">
+        <button class="ob as" id="btn-cpf" onclick="selectConta('cpf')">CPF — Pessoa Física<small>+R$3/pedido se &lt;450 pedidos/90d</small></button>
+        <button class="ob" id="btn-cnpj" onclick="selectConta('cnpj')">CNPJ — Pessoa Jurídica<small>Taxa fixa padrão</small></button>
+      </div>
+      <div class="tr"><div><span class="tl">Atingiu +450 pedidos nos últimos 90 dias?</span><small class="ts">+R$3 por unidade vendida</small></div><div class="tg" id="t-450" onclick="tog450()"></div></div>
+      <div class="tr"><div><span class="tl">Campanha de Destaque?</span><small class="ts">+2,5% de comissão</small></div><div class="tg" id="t-camp" onclick="togCamp()"></div></div>
+      <div class="tr"><div><span class="tl">Cupom de desconto próprio?</span><small class="ts">Desconto bancado por você</small></div><div class="tg" id="t-cupon" onclick="togCupon()"></div></div>
+      <div id="wrap-cupon" style="display:none;margin-top:10px;padding:14px;background:var(--surface);border-radius:12px;border:1px solid var(--border)">
+        <div class="fg c2">
+          <div class="f">
+            <label>Tipo de desconto</label>
+            <div class="og c2">
+              <button class="ob ac" id="btn-cupon-pct" onclick="setCuponTipo('pct')">% Porcentagem</button>
+              <button class="ob"    id="btn-cupon-real" onclick="setCuponTipo('real')">R$ Valor fixo</button>
+            </div>
+          </div>
+          <div class="f">
+            <label id="cupon-val-label">Valor do cupom (%)</label>
+            <div class="iw sr" id="cupon-wrap-pct"><input type="number" id="cupon-pct" placeholder="10" min="1" max="80" step="1" oninput="calc()"><span class="sfx">%</span></div>
+            <div class="iw" id="cupon-wrap-real" style="display:none"><span class="pfx">R$</span><input type="number" id="cupon-real" placeholder="5,00" min="0.01" step="0.01" oninput="calc()"></div>
+          </div>
+        </div>
+        <p class="hint" style="margin-top:8px">O desconto do cupom é bancado por você — reduz diretamente o seu lucro</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARGEM & PREÇO -->
+  <div class="card">
+    <div class="ch"><div class="cn">02</div><h2>Preço & Margem</h2></div>
+
+    <div class="fg c2" style="margin-bottom:14px">
+      <div class="f">
+        <label>Modo de precificação</label>
+        <select id="modo-preco" onchange="onModoChange()">
+          <option value="manual">Digitar preço de venda</option>
+          <option value="margem">Calcular por margem de contribuição</option>
+        </select>
+      </div>
+      <div class="f" id="wrap-preco-manual">
+        <label>Preço de venda</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="preco" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+      </div>
+    </div>
+
+    <!-- MODO MARGEM -->
+    <div id="wrap-margem" style="display:none">
+      <div class="f" style="margin-bottom:14px">
+        <label>Margem de contribuição desejada: <strong id="margem-pct-lbl" style="color:var(--accent)">30%</strong></label>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="margem-slider" min="5" max="80" value="30" oninput="onSlider(this)">
+        </div>
+        <div class="slider-labels"><span>5%</span><span>20%</span><span>40%</span><span>60%</span><span>80%</span></div>
+      </div>
+      <div class="f" style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 14px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Preço calculado automaticamente</div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-1px" id="preco-auto">R$ —</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px" id="preco-auto-info">Preencha os custos abaixo</div>
+      </div>
+    </div>
+
+    <!-- PROMOÇÃO -->
+    <hr>
+    <div class="tr">
+      <div><span class="tl">💜 Calcular preço com promoção?</span><small class="ts">Preço com margem para absorver desconto</small></div>
+      <div class="tg" id="t-promo" onclick="togPromo()"></div>
+    </div>
+    <div id="wrap-promo" style="display:none;margin-top:10px">
+      <div class="fg c2">
+        <div class="f">
+          <label>Desconto da promoção</label>
+          <div class="iw sr"><input type="number" id="promo-pct" placeholder="10" value="10" min="1" max="60" step="1" oninput="calc()"><span class="sfx">%</span></div>
+          <p class="hint">Padrão 10% · altere conforme campanha</p>
+        </div>
+        <div class="f">
+          <label>Anunciar por (antes do desconto)</label>
+          <div style="background:var(--surface);border:1px solid rgba(192,132,252,.4);border-radius:10px;padding:12px 13px">
+            <div style="font-family:'DM Mono',monospace;font-size:20px;font-weight:800;color:var(--promo);letter-spacing:-1px" id="preco-promo">—</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px" id="preco-promo-info">Preencha os dados</div>
+          </div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:8px;color:rgba(192,132,252,.7)">💜 Você anuncia com o preço maior · o comprador paga o valor com desconto · seu lucro fica intacto</p>
+    </div>
+  </div>
+
+  <!-- IMPRESSORA -->
+  <div class="card" id="card-impressora">
+    <div class="ch"><div class="cn">03</div><h2>Impressora & Energia</h2><span class="chtag">Bambu Lab + outras</span></div>
+    <div class="fg c2">
+      <div class="f s2">
+        <label>Modelo</label>
+        <select id="impressora" onchange="onImpressoraChange()">
+          <option value="0.08">Bambu Lab A1 Mini — 0,08 kWh/h</option>
+          <option value="0.10">Bambu Lab A1 — 0,10 kWh/h</option>
+          <option value="0.10">Bambu Lab P1P — 0,10 kWh/h</option>
+          <option value="0.10">Bambu Lab P1S — 0,10 kWh/h</option>
+          <option value="0.11">Bambu Lab X1 Carbon — 0,11 kWh/h</option>
+          <option value="0.20">Bambu Lab H2D — 0,20 kWh/h</option>
+          <option value="custom">Outra impressora (personalizada)</option>
+        </select>
+        <div id="wrap-impressora-custom" style="display:none;margin-top:10px">
+          <div class="fg c2">
+            <div class="f s2">
+              <label>Nome da impressora</label>
+              <input type="text" id="impressora-nome" placeholder="Ex: Creality Ender 3" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;width:100%;outline:none" oninput="calc()">
+            </div>
+            <div class="f s2">
+              <label>Consumo médio (kWh por hora)</label>
+              <div class="iw sr"><input type="number" id="impressora-kwh-custom" placeholder="0.25" min="0.01" max="5" step="0.01" oninput="calc()"><span class="sfx">kWh/h</span></div>
+              <p class="hint">Verifique na especificação técnica ou meça com medidor de consumo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="f">
+        <label>Horas de impressão</label>
+        <div class="iw sr"><input type="number" id="horas" placeholder="0" min="0" step="1" oninput="syncTime('h')"><span class="sfx">h</span></div>
+      </div>
+      <div class="f">
+        <label>Minutos de impressão</label>
+        <div class="iw sr"><input type="number" id="minutos" placeholder="0" min="0" max="59" step="1" oninput="syncTime('m')"><span class="sfx">min</span></div>
+      </div>
+      <div class="f s2">
+        <label>Valor do kWh</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="kwh" placeholder="0.85" min="0" step="0.01" oninput="calc()"></div>
+        <p class="hint">Média nacional ≈ R$0,85 · verifique sua conta</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILAMENTO -->
+  <div class="card" id="card-filamento">
+    <div class="ch"><div class="cn">04</div><h2>Filamento</h2></div>
+    <div class="fg c2">
+      <div class="f">
+        <label>Custo do filamento</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="custo-kg" placeholder="80,00" min="0" step="1" oninput="calc()"><span class="sfx">/kg</span></div>
+      </div>
+      <div class="f">
+        <label>Peso usado na peça</label>
+        <div class="iw sr"><input type="number" id="peso-g" placeholder="0" min="0" step="1" oninput="calc()"><span class="sfx">g</span></div>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:8px">Custo = (R$/kg ÷ 1000) × gramas · inclua desperdício se quiser</p>
+  </div>
+
+
+  <!-- CUSTO FORNECEDOR (produto normal) -->
+  <div class="card" id="card-fornecedor" style="display:none">
+    <div class="ch"><div class="cn">03</div><h2>Custo do produto</h2><span class="chtag">produto normal</span></div>
+
+    <!-- Modo: calcular preço de venda OU custo máximo do fornecedor -->
+    <div class="f" style="margin-bottom:16px">
+      <label>O que você quer calcular?</label>
+      <div class="og c2">
+        <button class="ob ac" id="btn-modo-pv" onclick="setModoNormal('pv')">
+          💰 Preço de venda
+          <small>Tenho o custo do fornecedor</small>
+        </button>
+        <button class="ob" id="btn-modo-cf" onclick="setModoNormal('cf')">
+          🔍 Custo máx. fornecedor
+          <small>Tenho o preço de venda alvo</small>
+        </button>
+      </div>
+    </div>
+
+    <!-- Modo PV: informar custo do fornecedor → calcular preço de venda -->
+    <div id="wrap-modo-pv">
+      <div class="fg c2">
+        <div class="f">
+          <label>Custo do produto (fornecedor)</label>
+          <div class="iw"><span class="pfx">R$</span><input type="number" id="custo-fornecedor" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+          <p class="hint">Valor pago ao fornecedor por unidade</p>
+        </div>
+        <div class="f">
+          <label>Margem desejada (%)</label>
+          <div class="iw sr"><input type="number" id="normal-margem-pct" placeholder="30" min="1" max="90" step="1" value="30" oninput="calc()"><span class="sfx">%</span></div>
+          <p class="hint">Sobre o preço de venda final</p>
+        </div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:4px">
+        <div style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Preço de venda calculado</div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-1px" id="normal-preco-calculado">R$ —</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace" id="normal-preco-info">Preencha o custo e a margem</div>
+      </div>
+    </div>
+
+    <!-- Modo CF: informar preço de venda alvo → calcular custo máximo -->
+    <div id="wrap-modo-cf" style="display:none">
+      <div class="fg c2">
+        <div class="f">
+          <label>Preço de venda alvo (R$)</label>
+          <div class="iw"><span class="pfx">R$</span><input type="number" id="normal-pv-alvo" placeholder="0,00" min="0" step="0.01" oninput="calcCustoMaxFornecedor()"></div>
+          <p class="hint">Quanto você quer cobrar do cliente</p>
+        </div>
+        <div class="f">
+          <label>Margem desejada (%)</label>
+          <div class="iw sr"><input type="number" id="normal-margem-cf" placeholder="30" min="1" max="90" step="1" value="30" oninput="calcCustoMaxFornecedor()"><span class="sfx">%</span></div>
+        </div>
+      </div>
+      <div style="background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.3);border-radius:12px;padding:16px;margin-top:8px">
+        <div style="font-size:10px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Custo máximo que pode pagar ao fornecedor</div>
+        <div style="font-size:28px;font-weight:800;color:var(--accent);letter-spacing:-1px" id="cf-resultado">R$ —</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace" id="cf-detalhe">Preencha o preço de venda e a margem</div>
+        <div id="cf-breakdown" style="margin-top:12px;border-top:1px solid rgba(0,229,160,.2);padding-top:12px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXTRAS -->
+  <div class="card">
+    <div class="ch"><div class="cn">05</div><h2>Demais custos</h2><span class="chtag">opcional</span></div>
+    <div class="fg c2">
+      <div class="f">
+        <label>Imposto (alíquota)</label>
+        <div class="iw sr"><input type="number" id="imposto" placeholder="0" min="0" max="100" step="0.1" oninput="calc()"><span class="sfx">%</span></div>
+        <p class="hint">Simples: 4–19,5% · MEI isento</p>
+      </div>
+      <div class="f">
+        <label>Embalagem / acabamento</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="embalagem" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+      </div>
+      <div class="f">
+        <label>Outros custos (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="outros" placeholder="0,00" min="0" step="0.01" oninput="calc()"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="rp">
+  <div class="empty-state" id="empty-state">
+    <div class="empty-ico">🖨️</div>
+    <p>Selecione o marketplace,<br>configure margem e custos.<br><br>O resultado aparece aqui<br>em tempo real.</p>
+  </div>
+
+  <div id="rp">
+
+    <div class="rhero">
+      <div class="rheader">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">Resultado</span>
+        <span class="rmbadge" id="res-badge">—</span>
+      </div>
+      <div class="mbig">
+        <div class="mbigl">Lucro líquido</div>
+        <div class="mbigv neutral" id="res-lucro">—</div>
+        <div class="mbigs" id="res-lh">—</div>
+      </div>
+      <div class="mgrid">
+        <div class="msm"><div class="msml">Margem real</div><div class="msmv neutral" id="res-margem">—</div></div>
+        <div class="msm"><div class="msml">Custo total</div><div class="msmv neutral" id="res-custo">—</div></div>
+        <div class="msm"><div class="msml">Taxa mktp</div><div class="msmv warnc" id="res-taxa">—</div></div>
+        <div class="msm"><div class="msml">Preço de venda</div><div class="msmv neutral" id="res-preco">—</div></div>
+      </div>
+    </div>
+
+    <!-- PROMO RESULT -->
+    <div class="promo-box" id="promo-box" style="display:none">
+      <div class="promo-box-title">💜 Preço para promoção</div>
+      <div class="promo-row">
+        <span class="promo-label">Anunciar por</span>
+        <span class="promo-price" id="pb-preco">—</span>
+      </div>
+      <div class="promo-row">
+        <span class="promo-label">Após desconto de <span id="pb-pct">—</span></span>
+        <span class="promo-val" id="pb-final">—</span>
+      </div>
+      <div class="promo-margin" id="pb-info">Lucro preservado após desconto: —</div>
+    </div>
+
+    <div class="al danger" id="a-danger"></div>
+    <div class="al warn" id="a-warn"></div>
+    <div class="al info" id="a-info"></div>
+
+    <button onclick="abrirSalvar()" id="btn-salvar" style="display:none;width:100%;background:transparent;border:1px solid var(--accent);color:var(--accent);padding:12px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px">💾 Salvar esta precificação</button>
+    <!-- CAPACIDADE -->
+    <div class="capcard">
+      <div class="dtitle">🏭 Capacidade produtiva</div>
+      <div class="capgrid">
+        <div class="capm"><div class="capml">Lucro/hora</div><div class="capmv" id="cap-lh">—</div><div class="capms">R$/hora</div></div>
+        <div class="capm"><div class="capml">Potencial diário</div><div class="capmv" id="cap-dia">—</div><div class="capms">R$/dia (20h)</div></div>
+        <div class="capm"><div class="capml">Potencial mensal</div><div class="capmv" id="cap-mes">—</div><div class="capms">R$/mês (30d)</div></div>
+      </div>
+      <p class="hint" style="margin-top:10px">Baseado no tempo da peça atual · considera 20h/dia × 30 dias de operação</p>
+    </div>
+
+    <!-- BAR -->
+    <div class="bcard">
+      <div class="btitle">Distribuição do preço</div>
+      <div class="sbar">
+        <div class="seg se" id="se" style="flex:0"></div>
+        <div class="seg sf" id="sf" style="flex:0"></div>
+        <div class="seg st" id="st" style="flex:0"></div>
+        <div class="seg sfr" id="sfr" style="flex:0"></div>
+        <div class="seg si" id="si" style="flex:0"></div>
+        <div class="seg sx" id="sx" style="flex:0"></div>
+        <div class="seg sp" id="sp" style="flex:0"></div>
+      </div>
+      <div class="sleg">
+        <span class="sli"><span class="sld" style="background:#4488ff"></span>Energia</span>
+        <span class="sli"><span class="sld" style="background:#ff88aa"></span>Filamento</span>
+        <span class="sli"><span class="sld" style="background:#ffb020"></span>Taxa</span>
+        <span class="sli"><span class="sld" style="background:#aa88ff"></span>Frete</span>
+        <span class="sli"><span class="sld" style="background:#ff6666"></span>Imposto</span>
+        <span class="sli"><span class="sld" style="background:#888"></span>Extras</span>
+        <span class="sli"><span class="sld" style="background:#00e5a0"></span>Lucro</span>
+      </div>
+    </div>
+
+    <!-- BREAKDOWN CASCATA -->
+    <div class="dcard">
+      <div class="dtitle">📋 Detalhamento cascata</div>
+
+      <!-- PREÇO DE VENDA (topo) -->
+      <div class="casc-top">
+        <span class="casc-top-label">🏷️ Preço de venda</span>
+        <span class="casc-top-val" id="bd-preco-top">—</span>
+      </div>
+
+      <!-- LINHAS GERADAS DINAMICAMENTE -->
+      <div id="bd-cascade-rows"></div>
+
+      <!-- LUCRO FINAL -->
+      <div class="casc-result" id="bd-result-box">
+        <div>
+          <div class="casc-result-label" id="bd-result-label">✅ Lucro líquido</div>
+          <div class="casc-result-pct" id="bd-result-pct">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="casc-result-val" id="bd-luc">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL ML/SHOPEE -->
+    <div class="dcard" id="detail-card" style="display:none">
+      <div class="dtitle" id="detail-title">—</div>
+      <div id="detail-body"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- VENDA DIRETA — usa demanda-panel diretamente via JS -->
+
+<!-- ===================== SOB DEMANDA TAB ===================== -->
+<div id="demanda-panel" style="display:none">
+<div class="layout">
+<!-- LEFT -->
+<div>
+
+  <!-- FORMA DE PAGAMENTO -->
+  <div class="card">
+    <div class="ch"><div class="cn">01</div><h2>Forma de pagamento</h2></div>
+    <p class="hint" style="margin-bottom:14px">O <strong style="color:var(--accent)">preço base é sempre o Pix</strong> — sem taxa. O cartão embute a taxa da maquininha no preço cobrado do cliente.</p>
+
+    <!-- Taxa do cartão -->
+    <div class="fg c2" style="margin-bottom:14px">
+      <div class="f">
+        <label>Taxa do cartão (%)</label>
+        <div class="og c3">
+          <button class="ob ac" id="sd-btn-debito"   onclick="sdSetCartao('debito')">Débito<small>~1,99%</small></button>
+          <button class="ob"    id="sd-btn-credito"  onclick="sdSetCartao('credito')">Crédito<small>~2,99%+</small></button>
+          <button class="ob"    id="sd-btn-custom"   onclick="sdSetCartao('custom')">Personalizada<small>Digite a taxa</small></button>
+        </div>
+      </div>
+      <!-- Parcelamento crédito -->
+      <div class="f" id="sd-wrap-parcelas" style="display:none">
+        <label>Parcelas</label>
+        <div class="og" id="sd-parcelas-btns"></div>
+      </div>
+      <!-- Taxa custom -->
+      <div class="f" id="sd-wrap-taxa-custom" style="display:none">
+        <label>Taxa personalizada (%)</label>
+        <div class="iw sr"><input type="number" id="sd-taxa-custom-val" placeholder="2.5" min="0" max="30" step="0.01" oninput="calcSD()"><span class="sfx">%</span></div>
+        <p class="hint">Consulte sua maquininha</p>
+      </div>
+    </div>
+
+    <!-- Taxa atual exibida -->
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)" id="sd-taxa-desc">Taxa cartão débito</span>
+      <span style="font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--warn)" id="sd-taxa-pct-display">1,99%</span>
+    </div>
+
+    <!-- Desconto Pix -->
+    <div style="background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.2);border-radius:12px;padding:14px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px">💚 Desconto para pagamento no Pix</div>
+      <div class="fg c2">
+        <div class="f">
+          <label>Desconto Pix (% menor que cartão)</label>
+          <div class="iw sr"><input type="number" id="sd-desc-pix-pct" placeholder="5" value="5" min="0" max="30" step="0.5" oninput="calcSD()"><span class="sfx">%</span></div>
+          <p class="hint">Padrão 5% · equivale aproximadamente à taxa da maquininha</p>
+        </div>
+        <div class="f">
+          <label>Preço no Pix (calculado)</label>
+          <div style="background:var(--surface);border:1px solid rgba(0,229,160,.3);border-radius:10px;padding:12px 13px">
+            <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:800;color:var(--accent)" id="sd-pix-preview">R$ —</div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:3px" id="sd-pix-preview-info">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOS DE PRODUÇÃO -->
+  <div class="card">
+    <div class="ch"><div class="cn">02</div><h2>Custos de produção</h2></div>
+
+    <!-- Mão de obra -->
+    <div class="fg c2" style="margin-bottom:8px">
+      <div class="f">
+        <label>Mão de obra</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-mao-obra" placeholder="35,00" min="0" step="1" value="35" oninput="calcSD()"><span class="sfx">/hora</span></div>
+        <p class="hint">R$35/h = referência mercado maker BR · ajuste conforme sua especialização</p>
+      </div>
+      <div class="f">
+        <label>Tempo de trabalho</label>
+        <div class="fg c2">
+          <div class="f"><div class="iw sr"><input type="number" id="sd-tempo-h" placeholder="0" min="0" step="1" oninput="calcSD()"><span class="sfx">h</span></div></div>
+          <div class="f"><div class="iw sr"><input type="number" id="sd-tempo-m" placeholder="0" min="0" max="59" step="1" oninput="calcSD()"><span class="sfx">min</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Materiais -->
+    <div class="fg c2">
+      <div class="f">
+        <label>Custo de material/filamento (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-material" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+      </div>
+      <div class="f">
+        <label>Energia elétrica (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-energia" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+        <p class="hint">Use os campos de energia acima (impressora + kWh) para obter o valor exato</p>
+      </div>
+      <div class="f">
+        <label>Embalagem (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-embalagem" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+      </div>
+      <div class="f">
+        <label>Entrega / deslocamento (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-entrega" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+      </div>
+      <div class="f">
+        <label>Imposto (alíquota %)</label>
+        <div class="iw sr"><input type="number" id="sd-imposto" placeholder="0" min="0" max="100" step="0.1" oninput="calcSD()"><span class="sfx">%</span></div>
+      </div>
+      <div class="f">
+        <label>Outros custos (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-outros" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- PREÇO -->
+  <div class="card">
+    <div class="ch"><div class="cn">03</div><h2>Preço de venda</h2></div>
+    <div class="fg c2">
+      <div class="f">
+        <label>Modo de precificação</label>
+        <select id="sd-modo" onchange="sdOnModoChange()">
+          <option value="manual">Digitar preço de venda</option>
+          <option value="margem">Calcular por margem desejada</option>
+        </select>
+      </div>
+      <div class="f" id="sd-wrap-manual">
+        <label>Preço de venda — cartão (R$)</label>
+        <div class="iw"><span class="pfx">R$</span><input type="number" id="sd-preco" placeholder="0,00" min="0" step="0.01" oninput="calcSD()"></div>
+      </div>
+    </div>
+    <div id="sd-wrap-margem" style="display:none">
+      <div class="f" style="margin-bottom:14px">
+        <label>Margem desejada: <strong id="sd-margem-lbl" style="color:var(--accent)">40%</strong></label>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="sd-margem-slider" min="5" max="90" value="40" oninput="sdOnSlider(this)">
+        </div>
+        <div class="slider-labels"><span>5%</span><span>25%</span><span>50%</span><span>75%</span><span>90%</span></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 14px">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Preço calculado automaticamente</div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-1px" id="sd-preco-auto">R$ —</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:4px" id="sd-preco-auto-info">Preencha os custos acima</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="cbtn" onclick="calcSD()">⚡ Calcular precificação</button>
+</div>
+
+<!-- RIGHT -->
+<div class="rp">
+  <div class="empty-state" id="sd-empty">
+    <div class="empty-ico">🤝</div>
+    <p>Configure os custos e o preço<br>para ver o resultado aqui<br>em tempo real.</p>
+  </div>
+  <div id="sd-rp" style="display:none">
+
+    <!-- HERO RESULT -->
+    <div class="rhero" id="sd-hero-box">
+      <div class="rheader">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">Resultado</span>
+        <span class="rmbadge" id="sd-pgto-badge">—</span>
+      </div>
+      <div class="mbig">
+        <div class="mbigl">Lucro líquido</div>
+        <div class="mbigv neutral" id="sd-res-lucro">—</div>
+        <div class="mbigs" id="sd-res-lh">—</div>
+      </div>
+      <div class="mgrid">
+        <div class="msm"><div class="msml">Margem real</div><div class="msmv neutral" id="sd-res-margem">—</div></div>
+        <div class="msm"><div class="msml">Custo total</div><div class="msmv neutral" id="sd-res-custo">—</div></div>
+        <div class="msm"><div class="msml">Taxa pagamento</div><div class="msmv warnc" id="sd-res-taxa">—</div></div>
+        <div class="msm"><div class="msml">Mão de obra</div><div class="msmv neutral" id="sd-res-mao">—</div></div>
+      </div>
+    </div>
+
+    <!-- SAÚDE DA MARGEM -->
+    <div class="capcard" id="sd-saude-card">
+      <div class="dtitle">🩺 Saúde da margem</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+        <div style="flex:1;height:14px;border-radius:7px;background:var(--border);overflow:hidden">
+          <div id="sd-saude-bar" style="height:100%;border-radius:7px;transition:all .4s;width:0%"></div>
+        </div>
+        <div id="sd-saude-pct" style="font-family:'DM Mono',monospace;font-size:16px;font-weight:700;min-width:52px;text-align:right">—</div>
+      </div>
+      <div id="sd-saude-label" style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;margin-bottom:4px">—</div>
+      <div id="sd-saude-dica" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6">—</div>
+    </div>
+
+    <!-- COMPARATIVO PIX vs CARTÃO -->
+    <div class="promo-box" id="sd-pix-alt-box">
+      <div class="promo-box-title">💚 Pix vs 💳 Cartão</div>
+      <div class="promo-row">
+        <span class="promo-label">💳 Preço no cartão (com taxa)</span>
+        <span class="promo-price" id="sd-pix-cartao">—</span>
+      </div>
+      <div class="promo-row">
+        <span class="promo-label">💚 Preço no Pix (sem taxa)</span>
+        <span class="promo-val" id="sd-pix-preco">—</span>
+      </div>
+      <div class="promo-margin" id="sd-pix-info">—</div>
+    </div>
+
+    <div class="al danger" id="sd-a-danger"></div>
+    <div class="al warn"   id="sd-a-warn"></div>
+    <div class="al info"   id="sd-a-info"></div>
+
+    <!-- CASCATA -->
+    <div class="dcard">
+      <div class="dtitle">📋 Detalhamento cascata</div>
+      <div class="casc-top">
+        <span class="casc-top-label">🏷️ Preço de venda</span>
+        <span class="casc-top-val" id="sd-bd-preco-top">—</span>
+      </div>
+      <div id="sd-bd-cascade-rows"></div>
+      <div class="casc-result" id="sd-bd-result-box">
+        <div>
+          <div class="casc-result-label" id="sd-bd-result-label">✅ Lucro líquido</div>
+          <div class="casc-result-pct" id="sd-bd-result-pct">—</div>
+        </div>
+        <div style="text-align:right">
+          <div class="casc-result-val" id="sd-bd-luc">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETALHES PAGAMENTO -->
+    <div class="dcard" id="sd-detail-card">
+      <div class="dtitle" id="sd-detail-title">💳 Detalhes do pagamento</div>
+      <div id="sd-detail-body"></div>
+    </div>
+
+  </div>
+</div>
+</div><!-- /demanda-panel -->
+
+<div id="hist-panel" style="display:none">
+  <div style="max-width:900px;padding:24px">
+    <div class="card">
+      <div class="ch"><div class="cn">📋</div><h2>Histórico</h2><button onclick="limparHistorico()" style="margin-left:auto;background:transparent;border:1px solid #ff6666;color:#ff6666;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer">🗑️ Limpar</button></div>
+      <div id="hist-lista" style="margin-top:16px"><p style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Nenhuma precificação salva.</p></div>
+    </div>
+  </div>
+</div>
+<!-- ===================== PREF TAB ===================== -->
+<div id="pref-panel" style="display:none">
+<div style="max-width:680px;padding:24px 0">
+<div class="card">
+  <div class="ch">
+    <div class="cn">⚙️</div>
+    <h2>Preferências padrão</h2>
+    <span class="chtag">salvo no navegador</span>
+    <span id="saved-indicator" style="margin-left:auto;font-size:12px;font-family:'DM Mono',monospace;color:var(--accent);opacity:0;transition:opacity .4s">✓ Salvo!</span>
+  </div>
+  <p style="color:var(--muted);font-size:13px;margin:0 0 20px">Valores carregados automaticamente em cada nova precificação.</p>
+
+  <!-- CONTA SHOPEE -->
+  <div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)">
+    <div style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Conta Shopee padrão</div>
+    <div class="og c2">
+      <button class="ob" id="p-btn-cpf" onclick="setPrefConta('cpf')">
+        👤 CPF
+        <small>Pessoa física</small>
+      </button>
+      <button class="ob" id="p-btn-cnpj" onclick="setPrefConta('cnpj')">
+        🏢 CNPJ
+        <small>Pessoa jurídica</small>
+      </button>
+    </div>
+    <input type="hidden" id="p-conta-shopee" value="cpf">
+  </div>
+
+  <!-- CUSTOS -->
+  <div style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Custos de produção</div>
+  <div class="fg c2">
+    <div class="f">
+      <label>Custo do filamento (R$/kg)</label>
+      <div class="iw"><span class="pfx">R$</span><input type="number" id="p-filamento" placeholder="80,00" min="0" step="1"><span class="sfx">/kg</span></div>
+    </div>
+    <div class="f">
+      <label>Valor do kWh (R$)</label>
+      <div class="iw"><span class="pfx">R$</span><input type="number" id="p-kwh" placeholder="0,85" min="0" step="0.01"></div>
+    </div>
+    <div class="f">
+      <label>Embalagem padrão (R$)</label>
+      <div class="iw"><span class="pfx">R$</span><input type="number" id="p-embalagem" placeholder="0,00" min="0" step="0.01"></div>
+    </div>
+    <div class="f">
+      <label>Imposto padrão (%)</label>
+      <div class="iw sr"><input type="number" id="p-imposto" placeholder="0" min="0" max="100" step="0.1"><span class="sfx">%</span></div>
+    </div>
+    <div class="f">
+      <label>Margem padrão (%)</label>
+      <div class="iw sr"><input type="number" id="p-margem" placeholder="30" min="5" max="80" step="1"><span class="sfx">%</span></div>
+      <p class="hint">Modo "calcular por margem"</p>
+    </div>
+    <div class="f">
+      <label>Desconto promoção padrão (%)</label>
+      <div class="iw sr"><input type="number" id="p-promo" placeholder="10" min="1" max="60" step="1"><span class="sfx">%</span></div>
+    </div>
+  </div>
+
+  <!-- IMPRESSORA -->
+  <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+    <div style="font-size:11px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Impressora padrão</div>
+    <select id="p-impressora" onchange="onPrefImpressoraChange()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 12px;font-size:14px">
+      <option value="0.08">Bambu Lab A1 Mini — 0,08 kWh/h</option>
+      <option value="0.10a1">Bambu Lab A1 — 0,10 kWh/h</option>
+      <option value="0.10p1p">Bambu Lab P1P — 0,10 kWh/h</option>
+      <option value="0.10p1s">Bambu Lab P1S — 0,10 kWh/h</option>
+      <option value="0.11">Bambu Lab X1 Carbon — 0,11 kWh/h</option>
+      <option value="0.20">Bambu Lab H2D — 0,20 kWh/h</option>
+      <option value="custom">Outra impressora (personalizada)</option>
+    </select>
+    <div id="wrap-p-impressora-custom" style="display:none;margin-top:10px">
+      <div class="fg c2">
+        <div class="f">
+          <label>Nome da impressora</label>
+          <input type="text" id="p-impressora-nome" placeholder="Ex: Creality Ender 3" style="width:100%;box-sizing:border-box;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px">
+        </div>
+        <div class="f">
+          <label>Consumo (kWh/h)</label>
+          <div class="iw sr"><input type="number" id="p-impressora-kwh-custom" placeholder="0,40" min="0" step="0.01"><span class="sfx">kWh/h</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="cbtn" style="flex:1;min-width:160px" onclick="savePrefs()">💾 Salvar preferências</button>
+    <button onclick="resetPrefs()" style="padding:17px 20px;background:var(--surface);border:1px solid var(--border);border-radius:13px;color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;cursor:pointer">Resetar</button>
+  </div>
+</div>
+</div>
+</div>
+
+<script>// DEBUG 3DECOM
+console.log("[3DEcom] script iniciando");
+
+
+// ==============================
+// STATE
+// ==============================
+let MP=null, mlAnuncio='classico', mlParcel=false;
+let shopeeConta='cpf', shopeeAlto=false, shopeeCamp=false;
+let cuponTipo='pct', cuponValor=0, cuponOn=false;
+let modoPreco='manual', margemSlider=30, promoOn=false;
+const el=id=>document.getElementById(id);
+const set=(id,v)=>{el(id).textContent=v};
+const fmt=v=>'R$ '+v.toFixed(2).replace('.',',');
+const pct=v=>v.toFixed(1)+'%';
+
+// ==============================
+// TIME SYNC (horas ↔ minutos)
+// ==============================
+function syncTime(from){
+  if(from==='h') calc();
+  else {
+    const m=parseInt(el('minutos').value)||0;
+    if(m>=60){ el('horas').value=(parseInt(el('horas').value)||0)+Math.floor(m/60); el('minutos').value=m%60; }
+    calc();
+  }
+}
+function getTotalHoras(){
+  const h=parseFloat(el('horas').value)||0;
+  const m=parseFloat(el('minutos').value)||0;
+  return h+(m/60);
+}
+function fmtTempo(hTotal){
+  const h=Math.floor(hTotal);
+  const m=Math.round((hTotal-h)*60);
+  if(h===0) return m+'min';
+  if(m===0) return h+'h';
+  return h+'h '+m+'min';
+}
+
+// ==============================
+// SHOPEE 2026
+// ==============================
+const SH=[
+  {min:0,   max:79.99,  pct:.20,fixo:4,  txt:'Até R$79,99'},
+  {min:80,  max:99.99,  pct:.14,fixo:16, txt:'R$80–R$99,99'},
+  {min:100, max:199.99, pct:.14,fixo:20, txt:'R$100–R$199,99'},
+  {min:200, max:499.99, pct:.14,fixo:26, txt:'R$200–R$499,99'},
+  {min:500, max:9999,   pct:.14,fixo:26, txt:'Acima R$500'},
+];
+const SHOP_TETO=100;
+function shFaixa(p){return SH.find(f=>p>=f.min&&p<=f.max)||SH[SH.length-1]}
+function calcShopee(p){
+  const f=shFaixa(p);
+  let pp=f.pct+(shopeeCamp?.025:0);
+  let com=Math.min(p*pp,SHOP_TETO);
+  let fixo=f.fixo;
+  if(shopeeConta==='cpf'&&shopeeAlto) fixo+=3;
+  if(p<8) fixo=p/2;
+  return{total:Math.max(0,com+fixo),com,fixo,faixa:f,pp,adicCPF:(shopeeConta==='cpf'&&shopeeAlto)?3:0};
+}
+// frete Shopee embutido na taxa — removido
+
+// ==============================
+// MERCADO LIVRE 2026
+// ==============================
+function mlPcts(){
+  const cat=el('ml-cat');
+  if(cat.value==='custom') return{c:(parseFloat(el('ml-tc').value)||0)/100,p:(parseFloat(el('ml-tp').value)||0)/100};
+  const[c,p]=cat.value.split('|').map(Number);
+  return{c:c/100,p:p/100};
+}
+function mlFixo(preco){
+  // Taxa fixa real 2026: R$0,49 por unidade se produto < R$12,50
+  return preco < 12.5 ? 0.49 : 0;
+}
+function calcML(preco){
+  const{c,p}=mlPcts();
+  const pp=mlAnuncio==='premium'?p:c;
+  const fixo=mlFixo(preco);
+  let total=preco*pp+fixo;
+  if(mlAnuncio==='premium'&&mlParcel) total+=preco*.0299;
+  return{total,com:preco*pp,fixo,pp,anticip:(mlAnuncio==='premium'&&mlParcel)?preco*.0299:0};
+}
+// ==============================
+// FRETE ML 2026 — Tabela oficial (válida a partir de 02/03/2026)
+// ==============================
+// Linhas: faixas de peso (kg máximo da faixa, -1 = acima de 150)
+// Colunas: [0–18.99, 19–48.99, 49–78.99, 79–99.99, 100–119.99, 120–149.99, 150–199.99, 200+]
+const ML_FRETE_TAB = [
+  // [pesoMax,  col0,  col1,  col2,   col3,   col4,   col5,   col6,   col7 ]
+  [  0.3,      5.65,  6.55,  7.75,  12.35,  14.35,  16.45,  18.45,  20.95 ],
+  [  0.5,      5.95,  6.65,  7.85,  13.25,  15.45,  17.65,  19.85,  22.55 ],
+  [  1.0,      6.05,  6.75,  7.95,  13.85,  16.15,  18.45,  20.75,  23.65 ],
+  [  1.5,      6.15,  6.85,  8.05,  14.15,  16.45,  18.85,  21.15,  24.65 ],
+  [  2.0,      6.25,  6.95,  8.15,  14.45,  16.85,  19.25,  21.65,  24.65 ],
+  [  3.0,      6.35,  7.95,  8.55,  15.75,  18.35,  21.05,  23.65,  26.25 ],
+  [  4.0,      6.45,  8.15,  8.95,  17.05,  19.85,  22.65,  25.55,  28.35 ],
+  [  5.0,      6.55,  8.35,  9.75,  18.45,  21.55,  24.65,  27.75,  30.75 ],
+  [  6.0,      6.65,  8.55,  9.95,  25.45,  28.55,  32.65,  35.75,  39.75 ],
+  [  7.0,      6.75,  8.75, 10.15,  27.05,  31.05,  36.05,  40.05,  44.05 ],
+  [  8.0,      6.85,  8.95, 10.35,  28.85,  33.65,  38.45,  43.25,  48.05 ],
+  [  9.0,      6.95,  9.15, 10.55,  29.65,  34.55,  39.55,  44.45,  49.35 ],
+  [ 11.0,      7.05,  9.55, 10.95,  41.25,  48.05,  54.95,  61.75,  68.65 ],
+  [ 13.0,      7.15,  9.95, 11.35,  42.15,  49.25,  56.25,  63.25,  70.25 ],
+  [ 15.0,      7.25, 10.15, 11.55,  45.05,  52.45,  59.95,  67.45,  74.95 ],
+  [ 17.0,      7.35, 10.35, 11.75,  48.55,  56.05,  63.55,  70.75,  78.65 ],
+  [ 20.0,      7.45, 10.55, 11.95,  54.75,  63.85,  72.95,  82.05,  91.15 ],
+  [ 25.0,      7.65, 10.95, 12.15,  64.05,  75.05,  84.75,  95.35, 105.95 ],
+  [ 30.0,      7.75, 11.15, 12.35,  65.95,  75.45,  85.55,  96.25, 106.95 ],
+  [ 40.0,      7.85, 11.35, 12.55,  67.75,  78.95,  88.95,  99.15, 107.05 ],
+  [ 50.0,      7.95, 11.55, 12.75,  70.25,  81.05,  92.05, 102.55, 110.75 ],
+  [ 60.0,      8.05, 11.75, 12.95,  74.95,  86.45,  98.15, 109.35, 118.15 ],
+  [ 70.0,      8.15, 11.95, 13.15,  80.25,  92.95, 105.05, 117.15, 126.55 ],
+  [ 80.0,      8.25, 12.15, 13.35,  83.95,  97.05, 109.85, 122.45, 132.25 ],
+  [ 90.0,      8.35, 12.35, 13.55,  93.25, 107.45, 122.05, 136.05, 146.95 ],
+  [100.0,      8.45, 12.55, 13.75, 106.55, 123.95, 139.55, 155.55, 167.95 ],
+  [125.0,      8.55, 12.75, 13.95, 119.25, 138.05, 156.05, 173.95, 187.95 ],
+  [150.0,      8.65, 12.75, 14.15, 126.55, 146.15, 165.65, 184.65, 199.45 ],
+  [  -1,       8.75, 12.95, 14.35, 166.15, 192.45, 217.55, 242.55, 261.95 ],
+];
+// Frete grátis RÁPIDO para produtos abaixo de R$79 (opcional)
+const ML_FRETE_RAPIDO = [
+  [  0.3,  12.35], [  0.5,  13.25], [  1.0,  13.85], [  1.5,  14.15],
+  [  2.0,  14.45], [  3.0,  15.75], [  4.0,  17.05], [  5.0,  18.45],
+  [  6.0,  25.45], [  7.0,  27.05], [  8.0,  28.85], [  9.0,  29.65],
+  [ 11.0,  41.25], [ 13.0,  42.15], [ 15.0,  45.05], [ 17.0,  48.55],
+  [ 20.0,  54.75], [ 25.0,  64.05], [ 30.0,  65.95], [ 40.0,  67.75],
+  [ 50.0,  70.25], [ 60.0,  74.95], [ 70.0,  80.25], [ 80.0,  83.95],
+  [ 90.0,  93.25], [100.0, 106.55], [125.0, 119.25], [150.0, 126.55],
+  [  -1,  166.15],
+];
+function mlFreteColuna(preco){
+  if(preco < 19)  return 0;
+  if(preco < 49)  return 1;
+  if(preco < 79)  return 2;
+  if(preco < 100) return 3;
+  if(preco < 120) return 4;
+  if(preco < 150) return 5;
+  if(preco < 200) return 6;
+  return 7;
+}
+function mlFreteTabela(peso, tabela){
+  const row = tabela.find(r => r[0] === -1 || peso <= r[0]);
+  return row ? row[1] : tabela[tabela.length-1][1];
+}
+let mlFreteManual = false, mlRapido = false, mlCorreios = false;
+function togMLFreteManual(){
+  mlFreteManual = !mlFreteManual;
+  if(mlFreteManual){ mlCorreios=false; el('t-ml-correios').classList.remove('on'); el('wrap-ml-correios').style.display='none'; }
+  el('t-ml-frete-manual').classList.toggle('on', mlFreteManual);
+  el('wrap-ml-frete-manual').style.display = mlFreteManual ? 'block' : 'none';
+  calc();
+}
+function togMLRapido(){
+  mlRapido = !mlRapido;
+  el('t-ml-rapido').classList.toggle('on', mlRapido);
+  calc();
+}
+function togMLCorreios(){
+  mlCorreios = !mlCorreios;
+  if(mlCorreios){ mlFreteManual=false; el('t-ml-frete-manual').classList.remove('on'); el('wrap-ml-frete-manual').style.display='none'; }
+  el('t-ml-correios').classList.toggle('on', mlCorreios);
+  el('wrap-ml-correios').style.display = mlCorreios ? 'block' : 'none';
+  calc();
+}
+function freteML(preco){
+  if(mlCorreios) return parseFloat(el('ml-frete-correios').value)||0;
+  if(mlFreteManual) return parseFloat(el('ml-frete-manual').value)||0;
+  const peso = parseFloat(el('ml-peso').value)||0;
+  if(peso <= 0) return 0; // sem peso → sem cálculo
+
+  // Abaixo de R$19: máximo metade do preço do produto
+  if(preco < 19){
+    const col0 = mlFreteTabela(peso, ML_FRETE_TAB.map(r=>[r[0],r[1]]));
+    return Math.min(col0, preco/2);
+  }
+  // Para produtos abaixo de R$79, opção de frete rápido
+  if(preco < 79 && mlRapido){
+    return mlFreteTabela(peso, ML_FRETE_RAPIDO);
+  }
+  const col = mlFreteColuna(preco);
+  return ML_FRETE_TAB.find(r => r[0]===-1 || peso<=r[0])?.[col+1] ?? 0;
+}
+function atualizaFreteDisplay(preco){
+  const peso = parseFloat(el('ml-peso').value)||0;
+  const fd = el('ml-frete-display');
+  const fi = el('ml-frete-info');
+  if(!fd) return;
+  if(mlCorreios){ fd.textContent=fmt(parseFloat(el('ml-frete-correios').value)||0); fi.textContent='Correios (PAC / SEDEX / Mini Envios)'; return; }
+  if(mlFreteManual){ fd.textContent='Manual'; fi.textContent='Valor inserido manualmente'; return; }
+  if(peso<=0){ fd.textContent='—'; fi.textContent='Informe o peso acima'; return; }
+  const v = freteML(preco);
+  fd.textContent = fmt(v);
+  if(preco<19) fi.textContent='Abaixo de R$19 · máx. 50% do preço';
+  else if(preco<79&&mlRapido) fi.textContent='Frete grátis e rápido (opcional)';
+  else if(preco<79) fi.textContent='Frete grátis padrão (R$19–78,99)';
+  else fi.textContent='Frete grátis e rápido (acima de R$79)';
+}
+
+// ==============================
+// MAIN CALC
+// ==============================
+function calcCustos(preco){
+  const aliq=parseFloat(el('imposto').value)||0;
+  const emb=parseFloat(el('embalagem').value)||0;
+  const outros=parseFloat(el('outros').value)||0;
+
+  let energia=0, filamento=0, horas=0;
+
+  if(tipoProduto==='normal'){
+    // Produto normal: custo = fornecedor, sem impressora/filamento
+    filamento = parseFloat(el('custo-fornecedor').value)||0; // reutiliza "filamento" no cascade
+    horas = 0;
+  } else {
+    // Produto 3D
+    const impSel=el('impressora').value;
+    const consumo=impSel==='custom'?(parseFloat(el('impressora-kwh-custom').value)||0):(parseFloat(impSel)||0);
+    horas=getTotalHoras();
+    const kwh=parseFloat(el('kwh').value)||0;
+    const custoKg=parseFloat(el('custo-kg').value)||0;
+    const pesoG=parseFloat(el('peso-g').value)||0;
+    energia=consumo*horas*kwh;
+    filamento=(custoKg/1000)*pesoG;
+  }
+  const imposto=preco*(aliq/100);
+  const extras=emb+outros;
+
+  // Cupom Shopee
+  let cupomDesc=0;
+  if(MP==='shopee'&&cuponOn){
+    if(cuponTipo==='pct'){const pct2=parseFloat(el('cupon-pct').value)||0;cupomDesc=preco*(pct2/100);}
+    else{cupomDesc=parseFloat(el('cupon-real').value)||0;}
+  }
+
+  let taxaData=null, frete=0, taxa=0;
+  if(MP==='meli'){
+    taxaData=calcML(preco);
+    taxa=taxaData.total;
+    frete=freteML(preco);
+    atualizaFreteDisplay(preco);
+  } else if(MP==='shopee'){
+    taxaData=calcShopee(preco);
+    taxa=taxaData.total;
+    frete=0; // frete embutido na taxa Shopee
+  }
+  const custoTotal=energia+filamento+taxa+frete+imposto+extras;
+  return{energia,filamento,taxa,frete,imposto,extras,cupomDesc,custoTotal,taxaData,horas};
+}
+
+function precoParaMargem(margemPct){
+  const m=margemPct/100;
+  const aliq=parseFloat(el('imposto').value)||0;
+  const emb=parseFloat(el('embalagem').value)||0;
+  const outros=parseFloat(el('outros').value)||0;
+
+  let energia=0, filamento=0, custoFixoSemTaxa=0;
+
+  if(tipoProduto==='normal'){
+    filamento = parseFloat(el('custo-fornecedor').value)||0;
+    custoFixoSemTaxa = filamento + emb + outros;
+  } else {
+    const impSel=el('impressora').value;
+    const consumo=impSel==='custom'?(parseFloat(el('impressora-kwh-custom').value)||0):(parseFloat(impSel)||0);
+    const horas=getTotalHoras();
+    const kwh=parseFloat(el('kwh').value)||0;
+    const custoKg=parseFloat(el('custo-kg').value)||0;
+    const pesoG=parseFloat(el('peso-g').value)||0;
+    energia=consumo*horas*kwh;
+    filamento=(custoKg/1000)*pesoG;
+    const cupomDescFixo = cuponOn&&cuponTipo!=='pct' ? (parseFloat(el('cupon-real').value)||0) : 0;
+    custoFixoSemTaxa=energia+filamento+emb+outros+cupomDescFixo;
+  }
+
+  let preco=(custoFixoSemTaxa)/(1-m-0.15);
+  if(preco<=0||!isFinite(preco)) preco=10;
+  for(let i=0;i<20;i++){
+    let taxa=0,frete=0;
+    if(MP==='meli'){taxa=calcML(preco).total;frete=freteML(preco);}
+    else if(MP==='shopee'){taxa=calcShopee(preco).total;frete=0;}
+    const imp=preco*(aliq/100);
+    const custo=custoFixoSemTaxa+taxa+frete+imp;
+    const novoPreco=custo/(1-m);
+    if(Math.abs(novoPreco-preco)<0.01) break;
+    preco=novoPreco;
+  }
+  return Math.max(0,preco);
+}
+function renderCascade(containerId, preco, items){
+  const container = el(containerId);
+  let running = preco;
+  let html = '';
+  items.forEach(item => {
+    if(item.val <= 0) return;
+    running -= item.val;
+    const pctVal = preco > 0 ? (item.val/preco*100) : 0;
+    html += `
+    <div class="casc-row">
+      <div class="casc-connector">
+        <div class="casc-line"></div>
+        <div class="casc-arrow"></div>
+      </div>
+      <div class="casc-body">
+        <div class="casc-left">
+          <span class="casc-dot" style="background:${item.color}"></span>
+          <span class="casc-name">${item.label}</span>
+        </div>
+        <div class="casc-right">
+          <span class="casc-minus">− ${item.val.toFixed(2).replace('.',',')} <span style="font-size:10px;opacity:.6">(${pctVal.toFixed(1)}%)</span></span>
+          <span class="casc-running">= R$ ${running.toFixed(2).replace('.',',')}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function calc(){
+  if(!MP) return;
+  let preco;
+
+  // ── VALIDAÇÕES ─────────────────────────────────────────────
+  const erros = [];
+
+  // Filamento: precisa de pelo menos custo/kg OU peso — se um está preenchido, o outro é obrigatório
+  const custoKgV = parseFloat(el('custo-kg').value)||0;
+  const pesoGV   = parseFloat(el('peso-g').value)||0;
+  if(custoKgV > 0 && pesoGV <= 0) erros.push('⚖️ Informe o <strong>peso da peça</strong> (gramas) para calcular o custo de filamento.');
+  if(pesoGV > 0 && custoKgV <= 0) erros.push('🧵 Informe o <strong>custo do filamento</strong> (R$/kg) para calcular o material.');
+  // Se ambos vazios, tudo bem — filamento opcional
+
+  // Energia: se tempo preenchido, precisa de kWh
+  const horasV = getTotalHoras();
+  const kwhV   = parseFloat(el('kwh').value)||0;
+  if(horasV > 0 && kwhV <= 0) erros.push('⚡ Informe o <strong>valor do kWh</strong> para calcular o custo de energia.');
+
+  // Impressora custom: precisa de kWh/h
+  if(el('impressora').value === 'custom' && (parseFloat(el('impressora-kwh-custom').value)||0) <= 0 && horasV > 0)
+    erros.push('🖨️ Informe o <strong>consumo da impressora</strong> (kWh/h) para calcular a energia.');
+
+  // ML específico
+  if(MP==='meli'){
+    if(el('ml-cat').value==='custom'){
+      const tc=parseFloat(el('ml-tc').value);
+      const tp=parseFloat(el('ml-tp').value);
+      if(isNaN(tc)||tc<=0||isNaN(tp)||tp<=0)
+        erros.push('📋 Preencha as <strong>taxas da sua categoria</strong> para calcular.');
+    }
+    const pesoOk = mlCorreios || mlFreteManual || (parseFloat(el('ml-peso').value)||0)>0;
+  }
+
+  // Preço: no modo manual, precisa de preço > 0
+  if(modoPreco==='manual'){
+    const pv=parseFloat(el('preco').value)||0;
+    if(pv<=0) erros.push('🏷️ Informe o <strong>preço de venda</strong> para calcular.');
+  }
+
+  if(erros.length > 0){
+    clearResults();
+    el('empty-state').style.display='block';
+    el('empty-state').querySelector('p').innerHTML = erros.map(e=>`${e}`).join('<br><br>');
+    return;
+  }
+  // ────────────────────────────────────────────────────────────
+
+  if(modoPreco==='margem'){
+    const m=parseInt(el('margem-slider').value)||30;
+    preco=precoParaMargem(m);
+    el('preco-auto').textContent=fmt(preco);
+    el('preco-auto-info').textContent=`Com margem de ${m}% sobre o preço de venda`;
+  } else {
+    preco=parseFloat(el('preco').value)||0;
+    if(preco<=0){ clearResults(); return; }
+  }
+
+  const {energia,filamento,taxa,frete,imposto,extras,cupomDesc,custoTotal,taxaData,horas}=calcCustos(preco);
+  const lucro=preco-custoTotal;
+  const margem=preco>0?(lucro/preco)*100:0;
+  const lucroH=horas>0?lucro/horas:null;
+  const lucroHoraAbs=horas>0?lucro/horas:0;
+
+  // Capacidade produtiva
+  const pecasPorDia=horas>0?(20/horas):0; // 20h/dia
+  const lucroDia=lucroHoraAbs*20;
+  const lucroMes=lucroDia*30;
+
+  // Show results
+  el('empty-state').style.display='none';
+  el('empty-state').querySelector('p').innerHTML='Selecione o marketplace,<br>configure margem e custos.<br><br>O resultado aparece aqui<br>em tempo real.';
+  el('rp').style.display='block';
+  el('btn-salvar').style.display='block';
+
+  // Badge
+  const badge=el('res-badge');
+  if(MP==='meli'){badge.textContent='Mercado Livre · '+(mlAnuncio==='classico'?'Clássico':'Premium');badge.className='rmbadge meli';}
+  else{badge.textContent='Shopee · '+(shopeeConta==='cpf'?'CPF':'CNPJ');badge.className='rmbadge shopee';}
+
+  // Hero
+  const lel=el('res-lucro');
+  lel.textContent=fmt(lucro);
+  lel.className='mbigv '+(lucro>0?'profit':lucro<0?'loss':'neutral');
+  set('res-lh',lucroH!==null?fmt(lucroH)+' / hora ('+fmtTempo(horas)+' de impressão)':'—');
+  const mel=el('res-margem');
+  mel.textContent=pct(margem);
+  mel.className='msmv '+(margem>=20?'profit':margem>=0?'warnc':'loss');
+  set('res-custo',fmt(custoTotal));
+  set('res-taxa',fmt(taxa));
+  set('res-preco',fmt(preco));
+
+  // CAPACIDADE
+  el('cap-lh').textContent=lucroH!==null?'R$ '+lucroH.toFixed(2).replace('.',','):'—';
+  el('cap-dia').textContent='R$ '+lucroDia.toFixed(0);
+  el('cap-mes').textContent='R$ '+lucroMes.toFixed(0);
+
+  // PROMO
+  if(promoOn){
+    const promoPct=parseFloat(el('promo-pct').value)||10;
+    // Preço de anúncio = preço normal ÷ (1 - desconto%)
+    // Assim, após o desconto o comprador paga exatamente o preço original, preservando o lucro
+    const precoAnuncio=preco/(1-promoPct/100);
+    const precoFinalCliente=precoAnuncio*(1-promoPct/100); // ≈ preco
+
+    // Atualiza painel ESQUERDO (dentro do wrap-promo)
+    el('preco-promo').textContent=fmt(precoAnuncio);
+    el('preco-promo-info').textContent='Cliente paga '+fmt(precoFinalCliente)+' após '+promoPct+'% off';
+
+    // Atualiza painel DIREITO (promo-box)
+    el('promo-box').style.display='block';
+    set('pb-preco',fmt(precoAnuncio));
+    set('pb-pct',promoPct+'%');
+    set('pb-final',fmt(precoFinalCliente));
+    set('pb-info','Lucro preservado após desconto: '+fmt(lucro));
+  } else {
+    el('promo-box').style.display='none';
+    el('preco-promo').textContent='—';
+    el('preco-promo-info').textContent='—';
+  }
+
+  // BREAKDOWN CASCATA
+  set('bd-preco-top', fmt(preco));
+  renderCascade('bd-cascade-rows', preco, [
+    {label:'Taxa marketplace',  color:'#ffb020', val:taxa},
+    {label:'Frete estimado',    color:'#aa88ff', val:frete},
+    {label:'Imposto',           color:'#ff6666', val:imposto},
+    {label:'Energia elétrica',  color:'#4488ff', val:energia},
+    {label:tipoProduto==='normal'?'Custo fornecedor':'Filamento', color:'#ff88aa', val:filamento},
+    {label:'Embalagem / extras',color:'#888',    val:extras},
+    {label:'Cupom próprio',     color:'#c084fc', val:cupomDesc||0},
+  ]);
+  const ll=el('bd-luc'); ll.textContent=fmt(lucro); ll.className='casc-result-val '+(lucro>=0?'profit':'loss');
+  const rb=el('bd-result-box'); rb.className='casc-result '+(lucro>=0?'profit':'loss');
+  el('bd-result-label').textContent=lucro>=0?'✅ Lucro líquido':'⛔ Prejuízo';
+  el('bd-result-pct').textContent=pct(margem)+' de margem · '+fmt(lucroH!==null?lucroH:0)+'/hora';
+
+  // BAR
+  const t=preco>0?preco:1;
+  const s=v=>Math.max(0,v)/t*100;
+  el('se').style.flex=s(energia);el('sf').style.flex=s(filamento);
+  el('st').style.flex=s(taxa);el('sfr').style.flex=s(frete);
+  el('si').style.flex=s(imposto);el('sx').style.flex=s(extras);
+  el('sp').style.flex=s(lucro);
+
+  // ALERTS
+  el('a-danger').style.display='none';el('a-warn').style.display='none';el('a-info').style.display='none';
+  if(lucro<0){
+    el('a-danger').style.display='block';
+    el('a-danger').textContent=`⛔ Prejuízo de ${fmt(Math.abs(lucro))}! Para empatar o preço mínimo é ${fmt(custoTotal)}.`;
+  } else if(margem<10){
+    el('a-warn').style.display='block';
+    el('a-warn').textContent=`⚠️ Margem muito baixa (${pct(margem)}). Aponte para 20–30% para sustentabilidade.`;
+  } else if(margem<20){
+    el('a-warn').style.display='block';
+    el('a-warn').textContent=`🔶 Margem de ${pct(margem)} — aceitável mas apertada. Tente 25%+.`;
+  }
+
+  // DETAIL CARD
+  const dc=el('detail-card');
+  const db=el('detail-body');
+  dc.style.display='block';
+  if(MP==='shopee'&&taxaData){
+    el('detail-title').textContent='🧡 Detalhes Shopee 2026';
+    const d=taxaData;
+    let h=`<div class="dr"><div class="dl">Faixa de preço</div><div class="dv">${d.faixa.txt}</div></div>
+    <div class="dr"><div class="dl">Comissão % (${(d.pp*100).toFixed(1)}%${shopeeCamp?' +2,5%':''})</div><div class="dv">${fmt(d.com)}</div></div>
+    <div class="dr"><div class="dl">Taxa fixa base</div><div class="dv">R$ ${d.faixa.fixo.toFixed(2).replace('.',',')}</div></div>`;
+    if(d.adicCPF>0) h+=`<div class="dr"><div class="dl" style="color:var(--warn)">+ Adicional CPF</div><div class="dv" style="color:var(--warn)">+ R$ 3,00</div></div>`;
+    if(cuponOn&&(cupomDesc||0)>0){const cv=cuponTipo==='pct'?(parseFloat(el('cupon-pct').value)||0)+'%':'R$ '+(parseFloat(el('cupon-real').value)||0).toFixed(2).replace('.',',');h+=`<div class="dr"><div class="dl" style="color:var(--promo)">Cupom próprio (${cv})</div><div class="dv" style="color:var(--promo)">− ${fmt(cupomDesc)}</div></div>`;}
+    h+=`<div class="dr tot"><div class="dl">Total Shopee</div><div class="dv" style="color:var(--shopee)">${fmt(d.total)}</div></div>`;
+    db.innerHTML=h;
+  } else if(MP==='meli'&&taxaData){
+    el('detail-title').textContent='🛒 Detalhes Mercado Livre 2026';
+    const d=taxaData;
+    let h=`<div class="dr"><div class="dl">Tipo</div><div class="dv">${mlAnuncio==='premium'?'Premium':'Clássico'}</div></div>
+    <div class="dr"><div class="dl">Comissão % (${(d.pp*100).toFixed(1)}%)</div><div class="dv">${fmt(d.com)}</div></div>
+    <div class="dr"><div class="dl">Taxa fixa ${d.fixo>0?'(produto abaixo de R$12,50)':'(não aplicável)'}</div><div class="dv">${d.fixo>0?'R$ 0,49':'—'}</div></div>`;
+    if(d.anticip>0) h+=`<div class="dr"><div class="dl" style="color:var(--warn)">Taxa antecipação (2,99%)</div><div class="dv" style="color:var(--warn)">${fmt(d.anticip)}</div></div>`;
+    const fr=freteML(preco);
+    const pesoVal=parseFloat(el('ml-peso').value)||0;
+    const freteDesc=mlCorreios?'Correios':mlFreteManual?'Manual':pesoVal<=0?'Peso não informado':(preco<79&&mlRapido?'Frete rápido':preco<79?'Frete padrão':'Frete rápido (acima R$79)');
+    h+=`<div class="dr"><div class="dl">Custo de envio (${freteDesc})</div><div class="dv">${fr>0?fmt(fr):'—'}</div></div>`;
+    h+=`<div class="dr tot"><div class="dl">Total ML</div><div class="dv" style="color:var(--meli)">${fmt(d.total+fr)}</div></div>`;
+    db.innerHTML=h;
+  }
+}
+
+function clearResults(){
+  el('empty-state').style.display='block';
+  el('rp').style.display='none';
+  el('preco-promo').textContent='—';
+  el('preco-promo-info').textContent='Preencha o preço de venda';
+}
+
+// ==============================
+// UI CONTROLS
+// ==============================
+function selectMP(mp){
+  MP=mp;
+  ['meli','shopee','direto'].forEach(t=>{
+    const tab=el('tab-'+t); if(tab) tab.classList.toggle('active',mp===t);
+    const rad=el('r-'+t);   if(rad) rad.textContent=mp===t?'✓':'';
+  });
+  el('mp-section').style.display=mp==='meli'?'block':'none';
+  el('shopee-section').style.display=mp==='shopee'?'block':'none';
+  // Venda Direta: mostra o demanda-panel embutido dentro da aba Precificar
+  const dp=el('demanda-panel');
+  if(mp==='direto'){
+    // Mover demanda-panel para dentro do calc-panel visualmente
+    dp.style.display='block';
+    dp.style.marginTop='0';
+    el('rp').style.display='none';
+    el('empty-state').style.display='none';
+    // Esconder os tabs de sob-demanda pois está inline
+    const tabDemanda=el('tab-demanda');
+    if(tabDemanda) tabDemanda.style.display='none';
+    calcSD();
+  } else {
+    dp.style.display='none';
+    const tabDemanda=el('tab-demanda');
+    if(tabDemanda) tabDemanda.style.display='';
+    calc();
+  }
+}
+function selectAnuncio(t){
+  mlAnuncio=t;
+  el('btn-classico').className='ob'+(t==='classico'?' am':'');
+  el('btn-premium').className='ob'+(t==='premium'?' am':'');
+  el('ml-parcel-row').style.display=t==='premium'?'flex':'none';
+  if(t==='classico'){mlParcel=false;el('t-parcel').classList.remove('on');}
+  calc();
+}
+function onCatChange(){
+  el('ml-custom-wrap').style.display=el('ml-cat').value==='custom'?'block':'none';
+  calc();
+}
+function togParcel(){mlParcel=!mlParcel;el('t-parcel').classList.toggle('on',mlParcel);calc()}
+function onImpressoraChange(){
+  const v=el('impressora').value;
+  el('wrap-impressora-custom').style.display=v==='custom'?'block':'none';
+  calc();
+}
+function onPrefImpressoraChange(){
+  const v=el('p-impressora').value;
+  const wrap=el('wrap-p-impressora-custom');
+  if(wrap) wrap.style.display=v==='custom'?'block':'none';
+}
+function selectConta(t){
+  shopeeConta=t;
+  el('btn-cpf').className='ob'+(t==='cpf'?' as':'');
+  el('btn-cnpj').className='ob'+(t==='cnpj'?' as':'');
+  if(t==='cnpj'){shopeeAlto=false;el('t-450').classList.remove('on');}
+  el('t-450').style.opacity=t==='cpf'?'1':'0.35';
+  calc();
+}
+function tog450(){if(shopeeConta!=='cpf')return;shopeeAlto=!shopeeAlto;el('t-450').classList.toggle('on',shopeeAlto);calc()}
+function togCamp(){shopeeCamp=!shopeeCamp;el('t-camp').classList.toggle('on',shopeeCamp);calc()}
+function togCupon(){
+  cuponOn=!cuponOn;
+  el('t-cupon').classList.toggle('on',cuponOn);
+  el('wrap-cupon').style.display=cuponOn?'block':'none';
+  calc();
+}
+function setCuponTipo(tipo){
+  cuponTipo=tipo;
+  el('btn-cupon-pct').classList.toggle('ac',tipo==='pct');
+  el('btn-cupon-real').classList.toggle('ac',tipo==='real');
+  el('cupon-wrap-pct').style.display=tipo==='pct'?'flex':'none';
+  el('cupon-wrap-real').style.display=tipo==='real'?'flex':'none';
+  el('cupon-val-label').textContent=tipo==='pct'?'Valor do cupom (%)':'Valor do cupom (R$)';
+  calc();
+}
+
+function onModoChange(){
+  modoPreco=el('modo-preco').value;
+  el('wrap-preco-manual').style.display=modoPreco==='manual'?'block':'none';
+  el('wrap-margem').style.display=modoPreco==='margem'?'block':'none';
+  calc();
+}
+function onSlider(s){
+  const v=parseInt(s.value)||30;
+  margemSlider=v;
+  s.style.setProperty('--val',(v-5)/(80-5)*100+'%');
+  el('margem-pct-lbl').textContent=v+'%';
+  calc();
+}
+function togPromo(){
+  promoOn=!promoOn;
+  el('t-promo').classList.toggle('on',promoOn);
+  el('wrap-promo').style.display=promoOn?'block':'none';
+  calc();
+}
+
+window.showTab = function showTab(tab){
+  console.log("[3DEcom] showTab:", tab);
+  if(tab==='hist') renderHistorico();
+  ['calc','demanda','hist','pref'].forEach(t=>{
+    const btn=el('tab-'+t); if(btn) btn.classList.toggle('active',tab===t);
+    const panel=el(t+'-panel'); if(panel) panel.style.display=tab===t?'block':'none';
+  });
+}
+
+
+// ==============================
+// SOB DEMANDA — STATE
+// ==============================
+// Lógica: preço base = cartão (com taxa embutida)
+//         preço Pix  = preço cartão × (1 - descPix%)
+let sdCartaoTipo='debito', sdParcelas=1;
+let sdModo='manual', sdMargemSlider=40;
+const SD_TAXAS={
+  debito:   {base:1.99, desc:'Débito à vista'},
+  credito1: {base:2.99, desc:'Crédito à vista'},
+  credito2: {base:4.49, desc:'Crédito 2x'},
+  credito3: {base:5.49, desc:'Crédito 3x'},
+  credito4: {base:6.49, desc:'Crédito 4x'},
+  credito6: {base:7.99, desc:'Crédito 6x'},
+  credito12:{base:11.99,desc:'Crédito 12x'},
+};
+function sdGetTaxaPct(){
+  const t=sdCartaoTipo;
+  if(t==='custom') return parseFloat(el('sd-taxa-custom-val').value)||0;
+  if(t==='credito') return (SD_TAXAS['credito'+sdParcelas]||SD_TAXAS.credito1).base;
+  return SD_TAXAS.debito.base;
+}
+function sdGetTaxaDesc(){
+  const t=sdCartaoTipo;
+  if(t==='custom') return 'Taxa personalizada (' + (parseFloat(el('sd-taxa-custom-val').value)||0).toFixed(2).replace('.',',') + '%)';
+  if(t==='credito') return (SD_TAXAS['credito'+sdParcelas]||SD_TAXAS.credito1).desc;
+  return SD_TAXAS.debito.desc;
+}
+function sdSetCartao(t){
+  sdCartaoTipo=t; sdParcelas=1;
+  ['debito','credito','custom'].forEach(x=>el('sd-btn-'+x).classList.toggle('ac',t===x));
+  el('sd-wrap-parcelas').style.display=t==='credito'?'block':'none';
+  el('sd-wrap-taxa-custom').style.display=t==='custom'?'block':'none';
+  if(t==='credito') sdRenderParcelas();
+  calcSD();
+}
+function sdRenderParcelas(){
+  const btns=[1,2,3,4,6,12];
+  el('sd-parcelas-btns').innerHTML=btns.map(n=>`<button class="ob${sdParcelas===n?' ac':''}" onclick="sdSetParcelas(${n})">${n}x${n===1?' (à vista)':''}</button>`).join('');
+}
+function sdSetParcelas(n){sdParcelas=n;sdRenderParcelas();calcSD();}
+function sdOnModoChange(){sdModo=el('sd-modo').value;el('sd-wrap-manual').style.display=sdModo==='manual'?'block':'none';el('sd-wrap-margem').style.display=sdModo==='margem'?'block':'none';calcSD();}
+function sdOnSlider(s){sdMargemSlider=parseInt(s.value)||40;s.style.setProperty('--val',(sdMargemSlider-5)/(90-5)*100+'%');el('sd-margem-lbl').textContent=sdMargemSlider+'%';calcSD();}
+
+function sdCalcCustos(precoCartao){
+  const maoObra=parseFloat(el('sd-mao-obra').value)||0;
+  const th=parseFloat(el('sd-tempo-h').value)||0;
+  const tm=parseFloat(el('sd-tempo-m').value)||0;
+  const tempoH=th+(tm/60);
+  const custoMao=maoObra*tempoH;
+  const material=parseFloat(el('sd-material').value)||0;
+  const energia=parseFloat(el('sd-energia').value)||0;
+  const embalagem=parseFloat(el('sd-embalagem').value)||0;
+  const entrega=parseFloat(el('sd-entrega').value)||0;
+  const aliq=parseFloat(el('sd-imposto').value)||0;
+  const outros=parseFloat(el('sd-outros').value)||0;
+  const imposto=precoCartao*(aliq/100);
+  const taxaPct=sdGetTaxaPct();
+  const taxa=precoCartao*(taxaPct/100);
+  // Pix: preço menor (sem taxa embutida)
+  const descPixPct=parseFloat(el('sd-desc-pix-pct').value)||5;
+  const precoPix=precoCartao*(1-descPixPct/100);
+  const custoBase=custoMao+material+energia+embalagem+entrega+imposto+outros;
+  const custoTotal=custoBase+taxa; // taxa só incide no cartão
+  return{custoMao,material,energia,embalagem,entrega,imposto,taxa,taxaPct,outros,custoTotal,custoBase,tempoH,precoPix,descPixPct};
+}
+
+function sdPrecoParaMargem(m){
+  const maoObra=parseFloat(el('sd-mao-obra').value)||0;
+  const th=parseFloat(el('sd-tempo-h').value)||0;
+  const tm=parseFloat(el('sd-tempo-m').value)||0;
+  const custoMao=maoObra*(th+(tm/60));
+  const material=parseFloat(el('sd-material').value)||0;
+  const energia=parseFloat(el('sd-energia').value)||0;
+  const embalagem=parseFloat(el('sd-embalagem').value)||0;
+  const entrega=parseFloat(el('sd-entrega').value)||0;
+  const aliq=parseFloat(el('sd-imposto').value)||0;
+  const outros=parseFloat(el('sd-outros').value)||0;
+  const custoBase=custoMao+material+energia+embalagem+entrega+outros;
+  const taxaPct=sdGetTaxaPct()/100;
+  const aliqD=aliq/100;
+  const denom=1-(m/100)-taxaPct-aliqD;
+  if(denom<=0) return 9999;
+  return Math.max(0,custoBase/denom);
+}
+
+// Saúde da margem
+const SD_SAUDE=[
+  {min:50, color:'#00e5a0', label:'🏆 Excelente',     dica:'Margem saudável e sustentável. Você está bem posicionado para crescer.'},
+  {min:35, color:'#7fff00', label:'✅ Muito boa',       dica:'Ótima margem. Seu preço está justo e seu lucro é sólido.'},
+  {min:25, color:'#ffb020', label:'👍 Boa',             dica:'Margem aceitável. Considere otimizar custos para chegar a 35%+.'},
+  {min:15, color:'#ff8800', label:'⚠️ Apertada',        dica:'Margem baixa. Qualquer imprevisto pode virar prejuízo. Reveja o preço.'},
+  {min:5,  color:'#ff4444', label:'🚨 Muito apertada',  dica:'Risco alto. Você está trabalhando quase de graça. Aumente o preço urgente.'},
+  {min:0,  color:'#ff0000', label:'💀 Insustentável',   dica:'Com essa margem, quanto mais vender, mais vai perder. Reavalie tudo.'},
+  {min:-999,color:'#cc0000',label:'⛔ Prejuízo',        dica:'Você está perdendo dinheiro em cada venda. Corrija agora.'},
+];
+function sdSaude(m){return SD_SAUDE.find(s=>m>=s.min)||SD_SAUDE[SD_SAUDE.length-1];}
+
+function calcSD(){
+  // precoCartao = preço que o cliente paga no cartão (inclui taxa embutida)
+  let precoCartao;
+  if(sdModo==='margem'){
+    precoCartao=sdPrecoParaMargem(sdMargemSlider);
+    el('sd-preco-auto').textContent=fmt(precoCartao);
+    el('sd-preco-auto-info').textContent='Com margem de '+sdMargemSlider+'% no cartão';
+  } else {
+    precoCartao=parseFloat(el('sd-preco').value)||0;
+  }
+  if(precoCartao<=0){el('sd-empty').style.display='block';el('sd-rp').style.display='none';return;}
+
+  const{custoMao,material,energia,embalagem,entrega,imposto,taxa,taxaPct,outros,custoTotal,custoBase,tempoH,precoPix,descPixPct}=sdCalcCustos(precoCartao);
+
+  // Lucro no cartão
+  const lucroCartao=precoCartao-custoTotal;
+  const margemCartao=precoCartao>0?(lucroCartao/precoCartao)*100:0;
+  // Lucro no Pix (sem taxa da maquininha, cliente paga menos)
+  const lucroPix=precoPix-custoBase;
+  const margemPix=precoPix>0?(lucroPix/precoPix)*100:0;
+  const lucroH=tempoH>0?lucroCartao/tempoH:null;
+
+  el('sd-empty').style.display='none';
+  el('sd-rp').style.display='block';
+
+  // Badge
+  const badge=el('sd-pgto-badge');
+  badge.textContent=sdGetTaxaDesc();
+  badge.className='rmbadge meli';
+
+  // Atualiza display de taxa e Pix preview no lado esquerdo
+  el('sd-taxa-desc').textContent='Taxa '+sdGetTaxaDesc();
+  el('sd-taxa-pct-display').textContent=taxaPct.toFixed(2).replace('.',',')+'%';
+  el('sd-pix-preview').textContent=fmt(precoPix);
+  el('sd-pix-preview-info').textContent=descPixPct+'% menor · cliente paga '+fmt(precoPix)+' no Pix';
+
+  // Hero (baseado no cartão)
+  const lel=el('sd-res-lucro');
+  lel.textContent=fmt(lucroCartao);
+  lel.className='mbigv '+(lucroCartao>0?'profit':lucroCartao<0?'loss':'neutral');
+  el('sd-res-lh').textContent=lucroH!==null?fmt(lucroH)+' / hora trabalhada':'—';
+  const mel=el('sd-res-margem');
+  mel.textContent=pct(margemCartao);
+  const saude=sdSaude(margemCartao);
+  mel.style.color=saude.color;
+  el('sd-res-custo').textContent=fmt(custoTotal);
+  el('sd-res-taxa').textContent=taxaPct>0?pct(taxaPct)+' = '+fmt(taxa):'—';
+  el('sd-res-mao').textContent=fmt(custoMao);
+
+  // Saúde
+  el('sd-saude-bar').style.width=Math.max(0,Math.min(100,margemCartao))+'%';
+  el('sd-saude-bar').style.background=saude.color;
+  el('sd-saude-pct').textContent=pct(margemCartao);
+  el('sd-saude-pct').style.color=saude.color;
+  el('sd-saude-label').textContent=saude.label;
+  el('sd-saude-label').style.color=saude.color;
+  el('sd-saude-dica').textContent=saude.dica;
+
+  // Comparativo Pix vs Cartão — sempre visível
+  el('sd-pix-alt-box').style.display='block';
+  el('sd-pix-cartao').textContent=fmt(precoCartao);
+  el('sd-pix-preco').textContent=fmt(precoPix);
+  el('sd-pix-info').textContent='Lucro no Pix: '+fmt(lucroPix)+' ('+pct(margemPix)+'  margem) · '+fmt(descPixPct)+'% menor para o cliente';
+
+  // Alertas
+  el('sd-a-danger').style.display='none';el('sd-a-warn').style.display='none';el('sd-a-info').style.display='none';
+  if(lucroCartao<0){
+    el('sd-a-danger').style.display='block';
+    el('sd-a-danger').textContent='⛔ Prejuízo de '+fmt(Math.abs(lucroCartao))+'! Preço mínimo no cartão: '+fmt(custoTotal)+'.';
+  } else if(margemCartao<15){
+    el('sd-a-warn').style.display='block';
+    el('sd-a-warn').textContent='⚠️ Margem muito apertada ('+pct(margemCartao)+'). Para produção sob demanda, aponte para 35%+.';
+  } else if(lucroH!==null&&lucroH<25){
+    el('sd-a-warn').style.display='block';
+    el('sd-a-warn').textContent='🔶 Lucro de '+fmt(lucroH)+'/hora. Avalie se esse valor é justo pela sua especialização.';
+  }
+
+  // Cascata (preço = cartão)
+  set('sd-bd-preco-top', fmt(precoCartao)+' (cartão)');
+  renderCascade('sd-bd-cascade-rows', precoCartao, [
+    {label:'Taxa cartão ('+pct(taxaPct)+')',color:'#ffb020', val:taxa},
+    {label:'Imposto',                       color:'#ff6666', val:imposto},
+    {label:'Mão de obra',                   color:'#00e5a0', val:custoMao},
+    {label:'Material / filamento',          color:'#ff88aa', val:material},
+    {label:'Energia elétrica',              color:'#4488ff', val:energia},
+    {label:'Embalagem',                     color:'#888',    val:embalagem},
+    {label:'Entrega / deslocamento',        color:'#aa88ff', val:entrega},
+    {label:'Outros custos',                 color:'#666',    val:outros},
+  ]);
+  const ll=el('sd-bd-luc');ll.textContent=fmt(lucroCartao);ll.className='casc-result-val '+(lucroCartao>=0?'profit':'loss');
+  const rb=el('sd-bd-result-box');rb.className='casc-result '+(lucroCartao>=0?'profit':'loss');
+  el('sd-bd-result-label').textContent=lucroCartao>=0?'✅ Lucro no cartão':'⛔ Prejuízo no cartão';
+  el('sd-bd-result-pct').textContent=pct(margemCartao)+' de margem'+(lucroH!==null?' · '+fmt(lucroH)+'/hora':'');
+
+  // Detalhe pagamento
+  let dh=`<div class="dr"><div class="dl">Tipo do cartão</div><div class="dv">${sdGetTaxaDesc()}</div></div>`;
+  dh+=`<div class="dr"><div class="dl">Taxa da maquininha</div><div class="dv" style="color:var(--warn)">${pct(taxaPct)} = ${fmt(taxa)}</div></div>`;
+  if(sdCartaoTipo==='credito'&&sdParcelas>1) dh+=`<div class="dr"><div class="dl">Valor por parcela</div><div class="dv">${fmt(precoCartao/sdParcelas)}</div></div>`;
+  dh+=`<div class="dr"><div class="dl" style="color:var(--accent)">💚 Preço no Pix (−${descPixPct}%)</div><div class="dv" style="color:var(--accent)">${fmt(precoPix)}</div></div>`;
+  dh+=`<div class="dr"><div class="dl" style="color:var(--accent)">Lucro no Pix</div><div class="dv" style="color:var(--accent)">${fmt(lucroPix)} (${pct(margemPix)})</div></div>`;
+  dh+=`<div class="dr tot"><div class="dl">Recebido no cartão (líq.)</div><div class="dv" style="color:var(--meli)">${fmt(precoCartao-taxa)}</div></div>`;
+  el('sd-detail-body').innerHTML=dh;
+}
+
+// Init sob demanda
+sdSetCartao('debito');
+const sdSl=el('sd-margem-slider');
+sdSl.style.setProperty('--val',(40-5)/(90-5)*100+'%');
+
+// ==============================
+// PREFERÊNCIAS (localStorage)
+// ==============================
+const PREF_KEY='3decom_prefs_v1';
+window.savePrefs = function savePrefs(){
+  console.log("[3DEcom] savePrefs OK");
+  const prefs={
+    filamento:el('p-filamento').value,
+    kwh:el('p-kwh').value,
+    embalagem:el('p-embalagem').value,
+    imposto:el('p-imposto').value,
+    margem:el('p-margem').value,
+    promo:el('p-promo').value,
+    impressora:el('p-impressora').value,
+  };
+  try{localStorage.setItem(PREF_KEY,JSON.stringify(prefs));}catch(e){}
+  applyPrefs(prefs);
+  const ind=el('saved-indicator');
+  ind.style.opacity='1';
+  setTimeout(()=>ind.style.opacity='0',2000);
+}
+function loadPrefs(){
+  try{
+    const raw=localStorage.getItem(PREF_KEY);
+    if(!raw) return;
+    const p=JSON.parse(raw);
+    el('p-filamento').value=p.filamento||'';
+    el('p-kwh').value=p.kwh||'';
+    el('p-embalagem').value=p.embalagem||'';
+    el('p-imposto').value=p.imposto||'';
+    el('p-margem').value=p.margem||'';
+    el('p-promo').value=p.promo||'';
+    
+    if(p.impressora) el('p-impressora').value=p.impressora;
+    applyPrefs(p);
+  }catch(e){}
+}
+function applyPrefs(p){
+  if(p.filamento) el('custo-kg').value=p.filamento;
+  if(p.kwh) el('kwh').value=p.kwh;
+  if(p.impressora) el('impressora').value=p.impressora;
+  if(p.embalagem) el('embalagem').value=p.embalagem;
+  if(p.imposto) el('imposto').value=p.imposto;
+  if(p.promo) el('promo-pct').value=p.promo;
+  if(p.margem){
+    const mv=parseInt(p.margem)||30;
+    el('margem-slider').value=mv;
+    margemSlider=mv;
+    el('margem-slider').style.setProperty('--val',(mv-5)/(80-5)*100+'%');
+    el('margem-pct-lbl').textContent=mv+'%';
+  }
+}
+window.resetPrefs = function resetPrefs(){
+  try{localStorage.removeItem(PREF_KEY);}catch(e){}
+  ['p-filamento','p-kwh','p-embalagem','p-imposto','p-margem','p-promo','p-impressora-nome','p-impressora-kwh-custom'].forEach(id=>{const e2=el(id);if(e2)e2.value='';});
+  el('p-impressora').value='0.08';
+  setPrefConta('cpf');
+}
+
+const HIST_KEY='3decom_hist';
+window.abrirSalvar = function abrirSalvar(){
+  console.log("[3DEcom] abrirSalvar OK");
+  const modal=document.getElementById('modal-salvar');
+  // Mover para body para escapar de qualquer stacking context
+  if(modal.parentNode !== document.body) document.body.appendChild(modal);
+  modal.style.cssText = modal.style.cssText.replace('display:none','display:flex');
+  modal.style.display = 'flex';
+  console.log("[3DEcom] modal display:", modal.style.display, "parent:", modal.parentNode.tagName);
+  setTimeout(()=>{ const i=document.getElementById('modal-nome-produto'); if(i) i.focus(); },100);
+}
+window.fecharModalSalvar = function fecharModalSalvar(){
+  document.getElementById('modal-salvar').style.display='none';
+  document.getElementById('modal-nome-produto').value='';
+  document.getElementById('modal-nome-erro').style.display='none';
+}
+window.confirmarSalvar = function confirmarSalvar(){
+  const nome=document.getElementById('modal-nome-produto').value.trim();
+  if(!nome){
+    document.getElementById('modal-nome-erro').style.display='block';
+    document.getElementById('modal-nome-produto').focus();
+    return;
+  }
+  const preco=parseFloat(el('preco')?.value)||0;
+  const mp=MP==='meli'?'Mercado Livre':MP==='shopee'?'Shopee':'Venda Direta';
+  const margem=el('res-margem')?el('res-margem').textContent:'—';
+  const lucro=el('res-lucro')?el('res-lucro').textContent:'—';
+  let hist=[];
+  try{hist=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch(e){}
+  hist.unshift({id:Date.now(),nome,mp,preco,margem,lucro,data:new Date().toLocaleDateString('pt-BR')});
+  if(hist.length>100)hist=hist.slice(0,100);
+  localStorage.setItem(HIST_KEY,JSON.stringify(hist));
+  fecharModalSalvar();
+  const b=el('btn-salvar');
+  if(b){const o=b.innerHTML;b.innerHTML='✅ Salvo!';setTimeout(()=>b.innerHTML=o,2000);}
+  renderHistorico();
+}
+function renderHistorico(){let hist=[];try{hist=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch(e){}const lista=el('hist-lista');if(!lista)return;if(!hist.length){lista.innerHTML='<p style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Nenhuma precificação salva.</p>';return;}lista.innerHTML=hist.map(h=>`<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><div style="font-weight:600;color:var(--text1);font-size:14px">${h.nome}</div><div style="font-size:11px;color:var(--muted)">${h.mp} · ${h.data}</div></div><div style="text-align:right"><div style="font-size:14px;font-weight:700;color:var(--accent)">R$ ${(h.preco||0).toFixed(2).replace('.',',')}</div><div style="font-size:11px;color:var(--muted)">${h.margem}</div></div><button onclick="deletarHist(${h.id})" style="background:transparent;border:none;color:#ff6666;cursor:pointer;font-size:16px">🗑️</button></div>`).join('');}
+function deletarHist(id){let hist=[];try{hist=JSON.parse(localStorage.getItem(HIST_KEY)||'[]');}catch(e){}hist=hist.filter(h=>h.id!==id);localStorage.setItem(HIST_KEY,JSON.stringify(hist));renderHistorico();}
+function limparHistorico(){if(confirm('Apagar todo o histórico?')){localStorage.removeItem(HIST_KEY);renderHistorico();}}
+
+// ==============================
+// TIPO DE PRODUTO (3D / Normal)
+// ==============================
+let tipoProduto = '3d'; // '3d' ou 'normal'
+let modoNormal = 'pv';  // 'pv' = calcular preço de venda | 'cf' = calcular custo fornecedor
+
+function selectTipo(tipo){
+  console.log("[3DEcom] selectTipo:", tipo);
+  tipoProduto = tipo;
+  el('btn-tipo-3d').className   = 'ob' + (tipo==='3d'     ? ' ag' : '');
+  el('btn-tipo-normal').className = 'ob' + (tipo==='normal' ? ' ag' : '');
+
+  // Mostrar/ocultar cards específicos
+  el('card-impressora').style.display = tipo==='3d' ? 'block' : 'none';
+  el('card-filamento').style.display  = tipo==='3d' ? 'block' : 'none';
+  el('card-fornecedor').style.display = tipo==='normal' ? 'block' : 'none';
+
+  // No modo normal, o campo de preço manual ainda funciona
+  // mas o preço pode ser calculado automaticamente pelo card-fornecedor
+  if(tipo==='normal' && modoNormal==='pv') calcNormal();
+  else calc();
+}
+
+function setModoNormal(modo){
+  modoNormal = modo;
+  el('btn-modo-pv').classList.toggle('ac', modo==='pv');
+  el('btn-modo-cf').classList.toggle('ac', modo==='cf');
+  el('wrap-modo-pv').style.display = modo==='pv' ? 'block' : 'none';
+  el('wrap-modo-cf').style.display = modo==='cf' ? 'block' : 'none';
+  if(modo==='cf') calcCustoMaxFornecedor();
+  else calcNormal();
+}
+
+function calcNormal(){
+  // Modo PV: calcula o preço de venda dado o custo do fornecedor + margem
+  const custoForn = parseFloat(el('custo-fornecedor').value)||0;
+  const margemPct = parseFloat(el('normal-margem-pct').value)||30;
+  if(custoForn <= 0){
+    el('normal-preco-calculado').textContent = 'R$ —';
+    el('normal-preco-info').textContent = 'Preencha o custo do fornecedor';
+    // Limpar preço e disparar calc() para mostrar validação
+    if(el('preco').value) calc();
+    return;
+  }
+  // Iterar para encontrar preço que satisfaz margem desejada com todas as taxas
+  const aliq = parseFloat(el('imposto').value)||0;
+  const emb  = parseFloat(el('embalagem').value)||0;
+  const outros = parseFloat(el('outros').value)||0;
+  const extras = emb + outros;
+  const m = margemPct/100;
+
+  let preco = custoForn / (1 - m - 0.15); // estimativa inicial
+  if(preco <= 0 || !isFinite(preco)) preco = custoForn * 2;
+
+  for(let i=0; i<25; i++){
+    let taxa=0, frete=0;
+    if(MP==='meli'){ taxa=calcML(preco).total; frete=freteML(preco); }
+    else if(MP==='shopee'){ taxa=calcShopee(preco).total; }
+    const imp = preco*(aliq/100);
+    const custoTotal = custoForn + taxa + frete + imp + extras;
+    const novoPreco = custoTotal / (1-m);
+    if(Math.abs(novoPreco-preco)<0.005) break;
+    preco = novoPreco;
+  }
+
+  el('normal-preco-calculado').textContent = fmt(preco);
+  const lucro = preco - (custoForn + (MP==='meli'?calcML(preco).total+freteML(preco):MP==='shopee'?calcShopee(preco).total:0) + preco*(aliq/100) + extras);
+  el('normal-preco-info').textContent = 'Lucro estimado: '+fmt(lucro)+' ('+pct(m*100)+'  margem)';
+
+  // Setar o preço no campo manual e disparar o calc() principal
+  el('preco').value = preco.toFixed(2);
+  el('modo-preco').value = 'manual';
+  modoPreco = 'manual';
+  el('wrap-preco-manual').style.display = 'block';
+  el('wrap-margem').style.display = 'none';
+  calc();
+}
+
+function calcCustoMaxFornecedor(){
+  const pvAlvo = parseFloat(el('normal-pv-alvo').value)||0;
+  const margemPct = parseFloat(el('normal-margem-cf').value)||30;
+
+  if(pvAlvo <= 0){
+    el('cf-resultado').textContent = 'R$ —';
+    el('cf-detalhe').textContent = 'Preencha o preço de venda alvo';
+    el('cf-breakdown').innerHTML = '';
+    return;
+  }
+
+  const preco = pvAlvo;
+  const m = margemPct/100;
+  const aliq = parseFloat(el('imposto').value)||0;
+  const emb  = parseFloat(el('embalagem').value)||0;
+  const outros = parseFloat(el('outros').value)||0;
+  const extras = emb + outros;
+
+  let taxa=0, frete=0, taxaDesc='';
+  if(MP==='meli'){
+    const td = calcML(preco); taxa = td.total; frete = freteML(preco);
+    taxaDesc = 'Taxa ML ('+pct(td.pp*100)+')';
+  } else if(MP==='shopee'){
+    const td = calcShopee(preco); taxa = td.total;
+    taxaDesc = 'Taxa Shopee';
+  } else {
+    taxaDesc = 'Sem taxa marketplace';
+  }
+  const imp = preco*(aliq/100);
+  const lucroDesejado = preco * m;
+
+  // custo_fornecedor = preco - taxa - frete - imp - extras - lucro
+  const custoMax = preco - taxa - frete - imp - extras - lucroDesejado;
+
+  el('cf-resultado').textContent = custoMax > 0 ? fmt(custoMax) : '⛔ Inviável';
+  el('cf-resultado').style.color = custoMax > 0 ? 'var(--accent)' : 'var(--danger)';
+
+  if(custoMax > 0){
+    el('cf-detalhe').textContent = 'Com margem de '+pct(margemPct)+', este é o custo máximo que pode pagar ao fornecedor';
+    // Breakdown
+    const rows = [
+      {label:'Preço de venda', val:preco, color:'var(--text1)', bold:true},
+      {label:'− '+taxaDesc, val:taxa, color:'var(--warn)'},
+      frete>0?{label:'− Frete estimado', val:frete, color:'#aa88ff'}:null,
+      imp>0?{label:'− Imposto ('+aliq+'%)', val:imp, color:'var(--danger)'}:null,
+      extras>0?{label:'− Emb. / outros', val:extras, color:'var(--muted)'}:null,
+      {label:'− Lucro desejado ('+pct(margemPct)+')', val:lucroDesejado, color:'var(--accent)'},
+    ].filter(Boolean);
+
+    el('cf-breakdown').innerHTML = rows.map((r,i) =>
+      `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;${i<rows.length-1?'border-bottom:1px solid var(--border)':''}">
+        <span style="font-size:12px;color:${r.color};font-weight:${r.bold?700:400}">${r.label}</span>
+        <span style="font-size:13px;font-weight:700;color:${r.color};font-family:'DM Mono',monospace">${r.bold?fmt(r.val):'− '+fmt(r.val)}</span>
+      </div>`
+    ).join('') +
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-top:4px;border-top:2px solid rgba(0,229,160,.4)">
+      <span style="font-size:13px;font-weight:700;color:var(--accent)">= Custo máx. fornecedor</span>
+      <span style="font-size:16px;font-weight:800;color:var(--accent);font-family:'DM Mono',monospace">${fmt(custoMax)}</span>
+    </div>`;
+  } else {
+    el('cf-detalhe').textContent = 'Com esse preço de venda e margem, não sobra nada para o fornecedor após as taxas.';
+    el('cf-breakdown').innerHTML = '';
+  }
+}
+
+
+function setPrefConta(conta){
+  const hid=el('p-conta-shopee'); if(hid) hid.value=conta;
+  const bc=el('p-btn-cpf');  if(bc)  bc.className ='ob'+(conta==='cpf'  ?' ag':'');
+  const bn=el('p-btn-cnpj'); if(bn)  bn.className ='ob'+(conta==='cnpj' ?' ag':'');
+}
+
+// ==============================
+// INIT
+// ==============================
+loadPrefs();
+selectTipo('3d');
+selectMP('shopee');
+// Init slider display
+const sl=el('margem-slider');
+sl.style.setProperty('--val',(sl.value-5)/(80-5)*100+'%');
+</script>
+
+<!-- MODAL SALVAR -->
+<div id="modal-salvar" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center" onclick="if(event.target===this)fecharModalSalvar()">
+  <div style="background:#0e0e1a;border:1px solid #333;border-radius:16px;padding:28px;width:92%;max-width:400px">
+    <h3 style="color:#fff;margin:0 0 8px;font-size:17px">💾 Salvar precificação</h3>
+    <p style="color:#666;font-size:13px;margin:0 0 16px">Nome do produto é obrigatório.</p>
+    <input id="modal-nome-produto" type="text" placeholder="Ex: Vaso decorativo P..." maxlength="60"
+      style="width:100%;box-sizing:border-box;padding:12px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:14px;outline:none"
+      oninput="document.getElementById('modal-nome-erro').style.display='none'"
+      onkeydown="if(event.key==='Enter')confirmarSalvar()">
+    <p id="modal-nome-erro" style="display:none;color:#f66;font-size:12px;margin:6px 0 0">⚠️ Digite o nome do produto.</p>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="confirmarSalvar()" style="flex:1;background:#00e5a0;color:#000;border:none;padding:12px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px">Salvar</button>
+      <button onclick="fecharModalSalvar()" style="flex:1;background:transparent;border:1px solid #333;color:#888;padding:12px;border-radius:8px;cursor:pointer;font-size:14px">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

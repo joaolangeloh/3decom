@@ -1,0 +1,12 @@
+import { createClient } from '@supabase/supabase-js'
+
+export function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) throw new Error('Supabase env vars não configuradas')
+  return createClient(url, key)
+}
+
+export const supabaseAdmin = {
+  from: (table: string) => getSupabaseAdmin().from(table),
+}
