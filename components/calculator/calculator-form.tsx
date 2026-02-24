@@ -1156,7 +1156,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       : 'border-border text-muted-foreground hover:border-accent/50'
                   }`}
                 >
-                  <span className="text-xs font-semibold block">Calcular Preco de Venda</span>
+                  <span className="text-xs font-semibold block">Calcular Preço de Venda</span>
                   <span className="text-[10px] opacity-70">Modo PV</span>
                 </button>
                 <button
@@ -1168,7 +1168,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       : 'border-border text-muted-foreground hover:border-accent/50'
                   }`}
                 >
-                  <span className="text-xs font-semibold block">Custo Maximo Fornecedor</span>
+                  <span className="text-xs font-semibold block">Custo Máximo Fornecedor</span>
                   <span className="text-[10px] opacity-70">Modo CF</span>
                 </button>
               </div>
@@ -1203,18 +1203,18 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       className="mt-2"
                     />
                     <p className="text-[10px] text-muted-foreground mt-1.5">
-                      % sobre o preco de venda (ja descontadas taxas)
+                      % sobre o preço de venda (já descontadas taxas)
                     </p>
                   </div>
                   {/* Show calculated price */}
                   {supplierCost > 0 && pvSuggestedPrice > 0 && (
                     <div className="bg-accent/5 border border-accent/20 rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">Preco de venda sugerido</p>
+                      <p className="text-xs text-muted-foreground">Preço de venda sugerido</p>
                       <p className="font-mono text-lg font-bold text-accent">
                         R$ {pvSuggestedPrice.toFixed(2).replace('.', ',')}
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-1">
-                        Preco automaticamente preenchido na secao Preco & Margem
+                        Preço automaticamente preenchido na seção Preço & Margem
                       </p>
                     </div>
                   )}
@@ -1224,7 +1224,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
               {normalMode === 'cf' && (
                 <div className="space-y-4">
                   <div>
-                    <Label>Preco de venda alvo (R$)</Label>
+                    <Label>Preço de venda alvo (R$)</Label>
                     <Input
                       type="number"
                       min={0}
@@ -1255,22 +1255,22 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   {cfResult && cfTargetPrice > 0 && (
                     <div className="space-y-3">
                       <div className={`border rounded-lg p-3 ${cfResult.maxCost > 0 ? 'bg-accent/5 border-accent/20' : 'bg-destructive/5 border-destructive/20'}`}>
-                        <p className="text-xs text-muted-foreground">Custo maximo do fornecedor</p>
+                        <p className="text-xs text-muted-foreground">Custo máximo do fornecedor</p>
                         <p className={`font-mono text-lg font-bold ${cfResult.maxCost > 0 ? 'text-accent' : 'text-destructive'}`}>
                           {cfResult.maxCost > 0
                             ? `R$ ${cfResult.maxCost.toFixed(2).replace('.', ',')}`
-                            : 'Inviavel'}
+                            : 'Inviável'}
                         </p>
                         {cfResult.maxCost <= 0 && (
                           <p className="text-[10px] text-destructive mt-1">
-                            Taxas + margem excedem o preco de venda
+                            Taxas + margem excedem o preço de venda
                           </p>
                         )}
                       </div>
                       {/* Breakdown */}
                       {cfResult.breakdown.length > 0 && (
                         <div className="bg-secondary/50 rounded-lg p-3 text-xs space-y-1">
-                          <p className="text-muted-foreground font-mono mb-2">Deducoes do preco de venda:</p>
+                          <p className="text-muted-foreground font-mono mb-2">Deduções do preço de venda:</p>
                           {cfResult.breakdown.map((item, i) => (
                             <div key={i} className="flex justify-between">
                               <span className="text-muted-foreground">{item.label}</span>

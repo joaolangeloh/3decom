@@ -61,9 +61,9 @@ export default function PreferenciasPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Preferencias</h1>
+        <h1 className="text-2xl font-bold">Preferências</h1>
         <p className="text-muted-foreground font-mono text-sm mt-1">
-          Valores padrao usados na calculadora
+          Valores padrão usados na calculadora
         </p>
       </div>
 
@@ -111,7 +111,7 @@ export default function PreferenciasPage() {
                   className="mt-1 font-mono w-32"
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  Media nacional ~ R$0,85
+                  Média nacional ~ R$0,85
                 </p>
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function PreferenciasPage() {
             <SectionTitle title="Filamento" />
             <div>
               <Label className="text-xs text-muted-foreground">
-                Custo padrao do filamento (R$/kg)
+                Custo padrão do filamento (R$/kg)
               </Label>
               <Input
                 type="number"
@@ -147,7 +147,7 @@ export default function PreferenciasPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Embalagem padrao (R$)
+                  Embalagem padrão (R$)
                 </Label>
                 <Input
                   type="number"
@@ -163,7 +163,7 @@ export default function PreferenciasPage() {
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Imposto padrao (%)
+                  Imposto padrão (%)
                 </Label>
                 <Input
                   type="number"
@@ -188,11 +188,11 @@ export default function PreferenciasPage() {
         {/* Card 4: Margem & Promo */}
         <Card className="border-border">
           <CardContent className="pt-6">
-            <SectionTitle title="Margem & Promocao" />
+            <SectionTitle title="Margem & Promoção" />
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Margem padrao (%)
+                  Margem padrão (%)
                 </Label>
                 <Input
                   type="number"
@@ -208,7 +208,7 @@ export default function PreferenciasPage() {
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Desconto promo padrao (%)
+                  Desconto promo padrão (%)
                 </Label>
                 <Input
                   type="number"
@@ -234,7 +234,7 @@ export default function PreferenciasPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label className="text-xs text-muted-foreground">
-                    Taxa do cartao padrao (%)
+                    Taxa do cartão padrão (%)
                   </Label>
                   <Input
                     type="number"
@@ -251,7 +251,7 @@ export default function PreferenciasPage() {
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground">
-                    Desconto Pix padrao (%)
+                    Desconto Pix padrão (%)
                   </Label>
                   <Input
                     type="number"
@@ -270,7 +270,7 @@ export default function PreferenciasPage() {
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground">
-                  Mao de obra padrao (R$/h)
+                  Mão de obra padrão (R$/h)
                 </Label>
                 <Input
                   type="number"
@@ -293,7 +293,7 @@ export default function PreferenciasPage() {
             <SectionTitle title="Shopee" />
             <div>
               <Label className="text-xs text-muted-foreground">
-                Tipo de vendedor padrao
+                Tipo de vendedor padrão
               </Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
                 <button
@@ -307,7 +307,7 @@ export default function PreferenciasPage() {
                 >
                   <span className="text-sm font-semibold block">CNPJ</span>
                   <span className="text-[10px] text-muted-foreground">
-                    Tabela padrao
+                    Tabela padrão
                   </span>
                 </button>
                 <button
@@ -345,7 +345,7 @@ export default function PreferenciasPage() {
             ) : (
               <>
                 <Save className="size-4" />
-                Salvar preferencias
+                Salvar preferências
               </>
             )}
           </Button>
@@ -356,7 +356,7 @@ export default function PreferenciasPage() {
             className="rounded-lg"
           >
             <RotateCcw className="size-4" />
-            Restaurar padrao
+            Restaurar padrão
           </Button>
         </div>
       </div>

@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
   Calculator,
   History,
   Settings,
@@ -13,10 +12,9 @@ import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/calculadora', label: 'Precificadora', icon: Calculator },
-  { href: '/historico', label: 'Historico', icon: History },
-  { href: '/preferencias', label: 'Preferencias', icon: Settings },
+  { href: '/historico', label: 'Histórico', icon: History },
+  { href: '/preferencias', label: 'Preferências', icon: Settings },
 ]
 
 interface SidebarProps {
@@ -31,7 +29,7 @@ export function Sidebar({ user }: SidebarProps) {
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center px-6">
-          <Link href="/dashboard" className="text-2xl font-bold tracking-tight">
+          <Link href="/calculadora" className="text-2xl font-bold tracking-tight">
             <span className="text-white">3D</span>
             <span className="text-[#00e5a0]">Ecom</span>
           </Link>

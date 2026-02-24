@@ -30,11 +30,9 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const protectedPaths = [
-    '/dashboard',
     '/calculadora',
-    '/materiais',
-    '/maquinas',
     '/historico',
+    '/preferencias',
   ]
   const isProtectedRoute = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
@@ -49,10 +47,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Logged in user on auth pages -> redirect to dashboard
+  // Logged in user on auth pages -> redirect to calculadora
   if (user && isAuthRoute) {
     const url = request.nextUrl.clone()
-    url.pathname = '/dashboard'
+    url.pathname = '/calculadora'
     return NextResponse.redirect(url)
   }
 

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { HistoryTable } from '@/components/history-table'
 import { History } from 'lucide-react'
 
-export const metadata = { title: 'Historico' }
+export const metadata = { title: 'Histórico' }
 
 export default async function HistoricoPage() {
   const supabase = await createClient()
@@ -15,9 +15,9 @@ export default async function HistoricoPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Historico</h1>
+        <h1 className="text-2xl font-bold">Histórico</h1>
         <p className="text-muted-foreground font-mono text-sm mt-1">
-          Todos os seus calculos de precificacao
+          Todos os seus cálculos de precificação
         </p>
       </div>
 
@@ -26,9 +26,9 @@ export default async function HistoricoPage() {
           <div className="flex items-center justify-center size-16 rounded-xl bg-accent/10 mb-4">
             <History className="size-8 text-accent" />
           </div>
-          <h3 className="font-semibold text-lg mb-1">Nenhum calculo</h3>
+          <h3 className="font-semibold text-lg mb-1">Nenhum cálculo</h3>
           <p className="text-muted-foreground text-sm max-w-sm">
-            Seus calculos salvos aparecerrao aqui. Use a calculadora para criar o primeiro.
+            Seus cálculos salvos aparecerão aqui. Use a calculadora para criar o primeiro.
           </p>
         </div>
       ) : (

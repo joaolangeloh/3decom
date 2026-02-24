@@ -9,10 +9,10 @@ export default function NotFound() {
         404
       </p>
       <h1 className="mt-2 text-2xl font-bold text-[#ededf8]">
-        Pagina nao encontrada
+        Página não encontrada
       </h1>
       <p className="mt-2 text-sm text-[#a0a0c0]">
-        A pagina que voce procura nao existe ou foi movida.
+        A página que você procura não existe ou foi movida.
       </p>
       <Button
         className="mt-8 bg-[#00e5a0] text-[#080810] hover:bg-[#00e5a0]/90 font-semibold"
@@ -20,7 +20,7 @@ export default function NotFound() {
       >
         <Link href="/">
           <ArrowLeft className="size-4" />
-          Voltar ao inicio
+          Voltar ao início
         </Link>
       </Button>
     </div>

@@ -28,7 +28,7 @@ export default async function AssinarPage() {
     .eq('user_id', user.id)
     .single()
 
-  if (subscription?.status === 'active') redirect('/dashboard')
+  if (subscription?.status === 'active') redirect('/calculadora')
 
   const lastlinkUrl = process.env.NEXT_PUBLIC_LASTLINK_URL || '#'
 
@@ -41,7 +41,7 @@ export default async function AssinarPage() {
             <span className="text-[#00e5a0]">Ecom</span>
           </div>
           <CardDescription className="font-mono text-sm">
-            Precificadora automatica para impressao 3D
+            Precificadora automática para impressão 3D
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -52,12 +52,12 @@ export default async function AssinarPage() {
             </p>
             <div className="mt-2 flex items-baseline justify-center gap-1">
               <span className="text-4xl font-bold text-accent">R$ 29</span>
-              <span className="text-muted-foreground">/mes</span>
+              <span className="text-muted-foreground">/mês</span>
             </div>
             <ul className="mt-4 space-y-2 text-left text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 text-accent" />
-                Calculadora de precificacao
+                Calculadora de precificação
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 text-accent" />
@@ -65,11 +65,11 @@ export default async function AssinarPage() {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 text-accent" />
-                Gerenciamento de maquinas
+                Gerenciamento de máquinas
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <CheckCircle2 className="h-4 w-4 text-accent" />
-                Historico de calculos
+                Histórico de cálculos
               </li>
             </ul>
           </div>
@@ -77,12 +77,12 @@ export default async function AssinarPage() {
         <CardFooter className="flex flex-col space-y-3">
           <Button asChild className="w-full">
             <Link href={lastlinkUrl} target="_blank">
-              Assinar agora — R$29/mes
+              Assinar agora — R$29/mês
             </Link>
           </Button>
           <ReloadButton />
           <p className="text-center text-xs text-muted-foreground">
-            Apos o pagamento, sua assinatura sera ativada automaticamente
+            Após o pagamento, sua assinatura será ativada automaticamente
           </p>
         </CardFooter>
       </Card>

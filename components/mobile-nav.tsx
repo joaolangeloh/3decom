@@ -3,16 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  LayoutDashboard,
   Calculator,
   History,
   Settings,
 } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/calculadora', label: 'Precificar', icon: Calculator },
-  { href: '/historico', label: 'Historico', icon: History },
+  { href: '/historico', label: 'Histórico', icon: History },
   { href: '/preferencias', label: 'Prefs', icon: Settings },
 ]
 

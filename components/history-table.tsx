@@ -107,12 +107,12 @@ export function HistoryTable({ calculations }: HistoryTableProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-border hover:bg-transparent">
-              <TableHead>Nome da peca</TableHead>
-              <TableHead>Preco Final</TableHead>
+              <TableHead>Nome da peça</TableHead>
+              <TableHead>Preço Final</TableHead>
               <TableHead className="hidden sm:table-cell">Lucro</TableHead>
               <TableHead className="hidden md:table-cell">Marketplace</TableHead>
               <TableHead className="hidden md:table-cell">Data</TableHead>
-              <TableHead className="w-[80px]">Acoes</TableHead>
+              <TableHead className="w-[80px]">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -164,7 +164,7 @@ export function HistoryTable({ calculations }: HistoryTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
             <AlertDialogDescription>
-              Essa acao nao pode ser desfeita. O calculo sera removido permanentemente.
+              Essa ação não pode ser desfeita. O cálculo será removido permanentemente.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

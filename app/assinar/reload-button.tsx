@@ -12,7 +12,7 @@ export function ReloadButton() {
       className="w-full"
       onClick={() => router.refresh()}
     >
-      Ja paguei
+      Já paguei
     </Button>
   )
 }

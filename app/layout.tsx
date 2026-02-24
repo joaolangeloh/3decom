@@ -15,11 +15,11 @@ const dmMono = DM_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "3DEcom - Precificadora para Impressao 3D",
+    default: "3DEcom - Precificadora para Impressão 3D",
     template: "%s | 3DEcom",
   },
   description:
-    "Calculadora de precificacao para impressao 3D. Gerencie materiais, maquinas e calcule precos com precisao.",
+    "Calculadora de precificação para impressão 3D. Calcule preços com precisão, taxas reais de Shopee e Mercado Livre.",
 };
 
 export default function RootLayout({

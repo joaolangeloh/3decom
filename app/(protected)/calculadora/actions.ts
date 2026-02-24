@@ -18,7 +18,7 @@ export async function saveCalculation(data: {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user) return { error: 'Nao autenticado' }
+  if (!user) return { error: 'Não autenticado' }
 
   const row = {
     name: data.name || `Cálculo ${new Date().toLocaleDateString('pt-BR')}`,
@@ -39,7 +39,6 @@ export async function saveCalculation(data: {
 
     if (error) return { error: error.message }
     revalidatePath('/historico')
-    revalidatePath('/dashboard')
     return { success: true, id: data.id }
   }
 
@@ -52,6 +51,5 @@ export async function saveCalculation(data: {
 
   if (error) return { error: error.message }
   revalidatePath('/historico')
-  revalidatePath('/dashboard')
   return { success: true, id: inserted.id }
 }

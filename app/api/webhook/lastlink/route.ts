@@ -46,8 +46,8 @@ export async function POST(req: Request) {
       req.headers.get('x-lastlink-token') ??
       req.headers.get('x-webhook-token') ??
       req.headers.get('authorization')?.replace('Bearer ', '') ??
-      (body as Record<string, unknown>).token as string | undefined ??
-      (body as Record<string, unknown>).Token as string | undefined
+      (body as unknown as Record<string, unknown>).token as string | undefined ??
+      (body as unknown as Record<string, unknown>).Token as string | undefined
 
     if (token !== LASTLINK_TOKEN) {
       console.log('Lastlink webhook auth failed. Received token:', token)
