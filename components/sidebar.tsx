@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
+import { signout } from '@/app/auth/signout/actions'
 
 const navItems = [
   { href: '/calculadora', label: 'Precificadora', icon: Calculator },
@@ -65,7 +66,7 @@ export function Sidebar({ user }: SidebarProps) {
           <div className="mb-3 truncate text-sm text-muted-foreground">
             {user.email}
           </div>
-          <form action="/auth/signout" method="POST">
+          <form action={signout}>
             <Button
               type="submit"
               variant="ghost"
