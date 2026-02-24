@@ -80,6 +80,10 @@ export default async function AssinarPage() {
             <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#555578] mb-4">
               Plano Anual
             </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-lg font-bold text-[#555578] line-through decoration-[#ff3f5e] decoration-2">R$ 696</span>
+              <span className="bg-[#ff3f5e] text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">-58%</span>
+            </div>
             <div className="flex items-baseline gap-1 mb-1.5">
               <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
               <span className="text-[clamp(36px,8vw,56px)] font-extrabold tracking-[-3px] text-white">
@@ -87,19 +91,18 @@ export default async function AssinarPage() {
               </span>
               <span className="font-mono text-[13px] text-[#555578]">/ano</span>
             </div>
-            <div className="font-mono text-[11px] text-[#00e5a0] mb-6">
-              = R$ 24,17/mês &middot;{' '}
-              <strong>2 meses grátis incluídos</strong>
+            <div className="font-mono text-[11px] text-[#ff3f5e] mb-6">
+              &#128293; <strong>Promoção de lançamento</strong> &middot; 58% OFF
             </div>
             <div className="font-mono text-[11px] text-[#b0b0cc] mb-6 p-2.5 bg-[rgba(0,229,160,0.07)] rounded-lg border border-[rgba(0,229,160,0.2)]">
-              &#128176; Garantia de 7 dias &middot; Economize R$ 58 por ano
+              &#128176; Garantia de 7 dias &middot; = R$ 24,17/mês
             </div>
             <hr className="border-[#1e1e30] my-5" />
             <div className="flex flex-col gap-2.5 mb-7">
               {[
                 { text: 'Tudo do plano mensal', bold: true },
                 { text: '2 meses grátis (paga 10, usa 12)', accent: true },
-                { text: 'Economia de R$ 58/ano', accent: true },
+                { text: 'Economia de R$406/ano', accent: true },
                 { text: 'Acesso prioritário a novidades' },
                 { text: 'Suporte prioritário por email' },
               ].map((f) => (
@@ -138,6 +141,10 @@ export default async function AssinarPage() {
             <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#555578] mb-4">
               Plano Mensal
             </div>
+            <div className="flex items-baseline gap-2 mb-1">
+              <span className="text-lg font-bold text-[#555578] line-through decoration-[#ff3f5e] decoration-2">R$ 58</span>
+              <span className="bg-[#ff3f5e] text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
+            </div>
             <div className="flex items-baseline gap-1 mb-1.5">
               <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
               <span className="text-[clamp(36px,8vw,56px)] font-extrabold tracking-[-3px] text-white">
@@ -147,8 +154,8 @@ export default async function AssinarPage() {
                 /mês
               </span>
             </div>
-            <div className="font-mono text-[11px] text-[#00e5a0] mb-6 min-h-[20px]">
-              {'\u00A0'}
+            <div className="font-mono text-[11px] text-[#ff3f5e] mb-6">
+              &#128293; <strong>Promoção de lançamento</strong> &middot; 50% OFF
             </div>
             <div className="font-mono text-[11px] text-[#b0b0cc] mb-6 p-2.5 bg-[rgba(0,229,160,0.08)] rounded-lg border border-[rgba(0,229,160,0.15)]">
               &#128176; Garantia de 7 dias &middot; Reembolso total se não

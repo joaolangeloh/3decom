@@ -124,12 +124,20 @@ export default function LandingPage() {
           <a href="#precos" className="text-[13px] font-semibold text-[#555578] hover:text-[#b0b0cc] transition-colors">Preços</a>
           <a href="#faq" className="text-[13px] font-semibold text-[#555578] hover:text-[#b0b0cc] transition-colors">FAQ</a>
         </div>
-        <Link
-          href="/auth/cadastro"
-          className="bg-[#00e5a0] text-black font-extrabold text-[13px] px-5 py-2.5 rounded-[10px] hover:bg-[#00c87a] transition-all hover:-translate-y-px"
-        >
-          Assinar agora &rarr;
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/auth/login"
+            className="text-[13px] font-semibold text-[#b0b0cc] hover:text-white transition-colors"
+          >
+            Login
+          </Link>
+          <a
+            href="#precos"
+            className="bg-[#00e5a0] text-black font-extrabold text-[13px] px-5 py-2.5 rounded-[10px] hover:bg-[#00c87a] transition-all hover:-translate-y-px"
+          >
+            Assinar agora &rarr;
+          </a>
+        </div>
       </nav>
 
       {/* ===== HERO ===== */}
@@ -163,12 +171,12 @@ export default function LandingPage() {
 
         {/* CTAs */}
         <div className="relative z-10 flex gap-3 items-center flex-wrap justify-center mb-12">
-          <Link
-            href="/auth/cadastro"
+          <a
+            href="#precos"
             className="bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black font-extrabold text-base px-9 py-[18px] rounded-[14px] inline-flex items-center gap-2.5 tracking-[-0.3px] transition-all hover:-translate-y-[3px] hover:shadow-[0_20px_50px_rgba(0,229,160,0.3)]"
           >
-            &#128640; Assinar com garantia de 7 dias
-          </Link>
+            &#128640; Ver planos e assinar
+          </a>
           <a
             href="#funcoes"
             className="text-[#b0b0cc] font-semibold text-[15px] px-7 py-[17px] rounded-[14px] border border-[#2a2a40] transition-all hover:text-[#ededf8] hover:bg-[#13131f]"
@@ -534,6 +542,10 @@ export default function LandingPage() {
               <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#555578] mb-4">
                 Plano Mensal
               </div>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-lg font-bold text-[#555578] line-through decoration-[#ff3f5e] decoration-2">R$ 58</span>
+                <span className="bg-[#ff3f5e] text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">-50%</span>
+              </div>
               <div className="flex items-baseline gap-1 mb-1.5">
                 <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
                 <span className="text-[clamp(44px,8vw,64px)] font-extrabold tracking-[-3px]">
@@ -543,8 +555,8 @@ export default function LandingPage() {
                   /mês
                 </span>
               </div>
-              <div className="font-mono text-[11px] text-[#00e5a0] mb-6 min-h-[20px]">
-                {'\u00A0'}
+              <div className="font-mono text-[11px] text-[#ff3f5e] mb-6">
+                &#128293; <strong>Promoção de lançamento</strong> &middot; 50% OFF
               </div>
               <div className="font-mono text-[11px] text-[#b0b0cc] mb-6 p-2.5 bg-[rgba(0,229,160,0.08)] rounded-lg border border-[rgba(0,229,160,0.15)]">
                 &#128176; Garantia de 7 dias &middot; Reembolso total se não gostar
@@ -584,23 +596,27 @@ export default function LandingPage() {
                 MELHOR VALOR
               </span>
               <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#555578] mb-4">Plano Anual</div>
+              <div className="flex items-baseline gap-2 mb-1">
+                <span className="text-lg font-bold text-[#555578] line-through decoration-[#ff3f5e] decoration-2">R$ 696</span>
+                <span className="bg-[#ff3f5e] text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">-58%</span>
+              </div>
               <div className="flex items-baseline gap-1 mb-1.5">
                 <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
                 <span className="text-[clamp(44px,8vw,64px)] font-extrabold tracking-[-3px]">290</span>
                 <span className="font-mono text-[13px] text-[#555578]">/ano</span>
               </div>
-              <div className="font-mono text-[11px] text-[#00e5a0] mb-6">
-                = R$ 24,17/mês &middot; <strong>2 meses grátis incluídos</strong>
+              <div className="font-mono text-[11px] text-[#ff3f5e] mb-6">
+                &#128293; <strong>Promoção de lançamento</strong> &middot; 58% OFF
               </div>
               <div className="font-mono text-[11px] text-[#b0b0cc] mb-6 p-2.5 bg-[rgba(0,229,160,0.07)] rounded-lg border border-[rgba(0,229,160,0.2)]">
-                &#128176; Garantia de 7 dias &middot; Economize R$ 58 por ano
+                &#128176; Garantia de 7 dias &middot; = R$ 24,17/mês
               </div>
               <hr className="border-[#1e1e30] my-5" />
               <div className="flex flex-col gap-2.5 mb-7">
                 {[
                   { text: 'Tudo do plano mensal', bold: true },
                   { text: '2 meses grátis (paga 10, usa 12)', accent: true },
-                  { text: 'Economia de R$ 58/ano', accent: true },
+                  { text: 'Economia de R$406/ano', accent: true },
                   { text: 'Acesso prioritário a novidades', bold: false },
                   { text: 'Suporte prioritário por email', bold: false },
                 ].map((f) => (
@@ -655,8 +671,8 @@ export default function LandingPage() {
               answer="Sim, sem burocracia. Cancele direto pelo portal de assinatura com um clique. Não tem multa, fidelidade ou carência. No plano anual, você mantém o acesso até o final do período pago."
             />
             <FaqItem
-              question="O plano anual realmente inclui 2 meses grátis?"
-              answer="Sim. O plano mensal custa R$29/mês = R$348/ano. O plano anual custa R$290, equivalente a pagar 10 meses e usar 12. Você economiza R$58, que são exatamente 2 meses de plano mensal."
+              question="Como funcionam os 2 meses grátis no plano anual?"
+              answer="No plano anual você paga R$290 por 12 meses de acesso — o equivalente a R$24,17/mês. Comparado com o mensal de R$29, é como ganhar 2 meses grátis. E com a promoção de lançamento, o desconto é de 58% sobre o preço original (R$696)."
             />
             <FaqItem
               question="Meus dados ficam seguros?"
@@ -679,12 +695,12 @@ export default function LandingPage() {
         <p className="relative z-10 font-mono text-sm text-[#b0b0cc] leading-[1.8] mb-10">
           Compre, use por 7 dias e, se não ficar satisfeito,<br />devolvemos 100% do seu dinheiro. Sem perguntas.
         </p>
-        <Link
-          href="/auth/cadastro"
+        <a
+          href="#precos"
           className="relative z-10 inline-flex bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black font-extrabold text-lg px-11 py-5 rounded-[14px] tracking-[-0.3px] transition-all hover:-translate-y-[3px] hover:shadow-[0_20px_50px_rgba(0,229,160,0.3)]"
         >
-          &#128640; Assinar agora com garantia
-        </Link>
+          &#128640; Ver planos e assinar
+        </a>
         <div className="relative z-10 flex items-center justify-center gap-5 font-mono text-[11px] text-[#555578] mt-6 flex-wrap">
           <span className="flex items-center gap-1">&#10003; Garantia de reembolso 7 dias</span>
           <span className="flex items-center gap-1">&#10003; Cancele quando quiser</span>
@@ -706,6 +722,11 @@ export default function LandingPage() {
           <a href="#taxas" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">Taxas</a>
           <a href="#precos" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">Preços</a>
           <a href="#faq" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">FAQ</a>
+        </div>
+        <div className="flex gap-5 justify-center flex-wrap mb-5">
+          <Link href="/termos" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">Termos de Uso</Link>
+          <Link href="/privacidade" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">Política de Privacidade</Link>
+          <a href="mailto:suporte@precificadora3decom.com.br" className="font-mono text-[11px] text-[#555578] hover:text-[#b0b0cc] transition-colors">suporte@precificadora3decom.com.br</a>
         </div>
         <div className="font-mono text-[10px] text-[#2a2a40]">
           &copy; 2026 3DEcom. Todos os direitos reservados.

@@ -1141,7 +1141,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       : 'border-border text-muted-foreground hover:border-accent/50'
                   }`}
                 >
-                  <span className="text-xs font-semibold block">Custo Máximo Fornecedor</span>
+                  <span className="text-xs font-semibold block">Calcular Custo Alvo do Produto</span>
                   <span className="text-[10px] opacity-70">Modo CF</span>
                 </button>
               </div>
