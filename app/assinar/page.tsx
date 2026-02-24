@@ -69,6 +69,11 @@ export default async function AssinarPage() {
           </p>
         </div>
 
+        {/* Já assinei */}
+        <div className="mb-6 flex justify-center">
+          <ReloadButton />
+        </div>
+
         {/* Plans grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Anual — destaque */}
@@ -191,7 +196,6 @@ export default async function AssinarPage() {
             &#128274; Pagamento seguro &nbsp;&middot;&nbsp; Cancele quando
             quiser &nbsp;&middot;&nbsp; Sem fidelidade
           </div>
-          <ReloadButton />
           <p className="text-center text-xs text-[#555578]">
             Após o pagamento, sua assinatura será ativada automaticamente
           </p>

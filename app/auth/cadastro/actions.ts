@@ -24,12 +24,14 @@ export async function signup(prevState: unknown, formData: FormData) {
     return { error: 'A senha deve ter pelo menos 6 caracteres.' }
   }
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { name },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/confirm`,
+      emailRedirectTo: `${siteUrl}/auth/confirm`,
     },
   })
 

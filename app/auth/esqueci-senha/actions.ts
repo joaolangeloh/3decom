@@ -10,8 +10,10 @@ export async function resetPassword(prevState: unknown, formData: FormData) {
     return { error: 'Informe seu email.' }
   }
 
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/confirm`,
+    redirectTo: `${siteUrl}/auth/confirm`,
   })
 
   if (error) {

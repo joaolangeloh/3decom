@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { login } from './actions'
+import { updatePassword } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,8 +15,8 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(login, null)
+export default function RedefinirSenhaPage() {
+  const [state, formAction, pending] = useActionState(updatePassword, null)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -26,9 +26,9 @@ export default function LoginPage() {
             <span className="text-white">3D</span>
             <span className="text-[#00e5a0]">Ecom</span>
           </div>
-          <CardTitle className="text-xl">Entrar</CardTitle>
+          <CardTitle className="text-xl">Redefinir senha</CardTitle>
           <CardDescription className="font-mono text-sm">
-            Acesse sua conta para continuar
+            Digite sua nova senha
           </CardDescription>
         </CardHeader>
         <form action={formAction}>
@@ -39,49 +39,40 @@ export default function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email" className="font-mono text-sm">
-                Email
+              <Label htmlFor="password" className="font-mono text-sm">
+                Nova senha
               </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="seu@email.com"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="font-mono text-sm">
-                  Senha
-                </Label>
-                <Link
-                  href="/auth/esqueci-senha"
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors"
-                >
-                  Esqueci a senha
-                </Link>
-              </div>
               <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Sua senha"
+                placeholder="Mínimo 6 caracteres"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" className="font-mono text-sm">
+                Confirmar nova senha
+              </Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="Repita a nova senha"
                 required
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 mt-2">
             <Button type="submit" className="w-full" disabled={pending}>
-              {pending ? 'Entrando...' : 'Entrar'}
+              {pending ? 'Salvando...' : 'Salvar nova senha'}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Não tem uma conta?{' '}
               <Link
-                href="/auth/cadastro"
+                href="/auth/login"
                 className="font-medium text-primary hover:underline"
               >
-                Criar conta
+                Voltar para o login
               </Link>
             </p>
           </CardFooter>

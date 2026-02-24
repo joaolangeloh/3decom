@@ -35,7 +35,7 @@ export default function ConfirmarEmailPage() {
             Não encontrou? Verifique a caixa de spam.
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-3">
+        <CardFooter className="flex flex-col space-y-3 mt-2">
           <Button asChild variant="outline" className="w-full">
             <Link href="/auth/login">
               Voltar para o login
