@@ -37,5 +37,5 @@ export async function signup(prevState: unknown, formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/assinar')
+  redirect('/auth/confirmar-email')
 }
