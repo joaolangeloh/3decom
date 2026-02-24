@@ -31,7 +31,7 @@ export async function signup(prevState: unknown, formData: FormData) {
     password,
     options: {
       data: { name },
-      emailRedirectTo: `${siteUrl}/auth/confirm`,
+      emailRedirectTo: `${siteUrl}/assinar`,
     },
   })
 

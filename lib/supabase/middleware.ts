@@ -25,6 +25,19 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
+  // PKCE flow: exchange code for session and redirect to clean URL
+  const code = request.nextUrl.searchParams.get('code')
+  if (code) {
+    await supabase.auth.exchangeCodeForSession(code)
+    const cleanUrl = request.nextUrl.clone()
+    cleanUrl.searchParams.delete('code')
+    const response = NextResponse.redirect(cleanUrl)
+    for (const cookie of supabaseResponse.cookies.getAll()) {
+      response.cookies.set(cookie)
+    }
+    return response
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -48,7 +61,8 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Logged in user on auth pages -> redirect to calculadora
-  if (user && isAuthRoute) {
+  // Exception: /auth/redefinir-senha (user needs to set new password after recovery)
+  if (user && isAuthRoute && request.nextUrl.pathname !== '/auth/redefinir-senha') {
     const url = request.nextUrl.clone()
     url.pathname = '/calculadora'
     return NextResponse.redirect(url)
