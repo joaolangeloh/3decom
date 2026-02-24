@@ -30,7 +30,17 @@ export default async function AssinarPage() {
 
   if (subscription?.status === 'active') redirect('/calculadora')
 
-  const lastlinkUrl = process.env.NEXT_PUBLIC_LASTLINK_URL || '#'
+  const baseUrl = process.env.NEXT_PUBLIC_LASTLINK_URL || '#'
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', user.id)
+    .single()
+
+  const params = new URLSearchParams()
+  params.set('email', user.email ?? '')
+  if (profile?.name) params.set('name', profile.name)
+  const lastlinkUrl = `${baseUrl}?${params.toString()}`
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

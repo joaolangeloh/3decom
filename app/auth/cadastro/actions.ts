@@ -29,6 +29,7 @@ export async function signup(prevState: unknown, formData: FormData) {
     password,
     options: {
       data: { name },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/confirm`,
     },
   })
 
