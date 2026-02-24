@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { loadPrefs, savePrefs, DEFAULT_PREFS, type Preferences } from '@/lib/preferences'
 import { PRINTERS, CUSTOM_PRINTER_ID } from '@/lib/printers'
 import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { DecimalInput } from '@/components/ui/decimal-input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import {
@@ -33,11 +33,6 @@ export default function PreferenciasPage() {
     setPrefs(loadPrefs())
     setMounted(true)
   }, [])
-
-  function parseNum(val: string, fallback: number): number {
-    const n = parseFloat(val)
-    return isNaN(n) ? fallback : n
-  }
 
   function handleSave() {
     savePrefs(prefs)
@@ -100,14 +95,9 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Valor do kWh (R$)
                 </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step={0.01}
+                <DecimalInput
                   value={prefs.kwhPrice}
-                  onChange={(e) =>
-                    update({ kwhPrice: parseNum(e.target.value, 0) })
-                  }
+                  onValueChange={(v) => update({ kwhPrice: v })}
                   className="mt-1 font-mono w-32"
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">
@@ -126,14 +116,9 @@ export default function PreferenciasPage() {
               <Label className="text-xs text-muted-foreground">
                 Custo padrão do filamento (R$/kg)
               </Label>
-              <Input
-                type="number"
-                min={0}
-                step={1}
+              <DecimalInput
                 value={prefs.filamentPricePerKg}
-                onChange={(e) =>
-                  update({ filamentPricePerKg: parseNum(e.target.value, 0) })
-                }
+                onValueChange={(v) => update({ filamentPricePerKg: v })}
                 className="mt-1 font-mono w-32"
               />
             </div>
@@ -149,14 +134,10 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Embalagem padrão (R$)
                 </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step={0.5}
-                  value={prefs.packagingCost || ''}
-                  onChange={(e) =>
-                    update({ packagingCost: parseNum(e.target.value, 0) })
-                  }
+                <DecimalInput
+                  value={prefs.packagingCost}
+                  onValueChange={(v) => update({ packagingCost: v })}
+                  hideZero
                   placeholder="0,00"
                   className="mt-1 font-mono"
                 />
@@ -165,15 +146,10 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Imposto padrão (%)
                 </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={50}
-                  step={0.5}
-                  value={prefs.taxPercent || ''}
-                  onChange={(e) =>
-                    update({ taxPercent: parseNum(e.target.value, 0) })
-                  }
+                <DecimalInput
+                  value={prefs.taxPercent}
+                  onValueChange={(v) => update({ taxPercent: v })}
+                  hideZero
                   placeholder="0"
                   className="mt-1 font-mono"
                 />
@@ -194,15 +170,10 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Margem padrão (%)
                 </Label>
-                <Input
-                  type="number"
-                  min={5}
-                  max={80}
-                  step={1}
+                <DecimalInput
                   value={prefs.marginPercent}
-                  onChange={(e) =>
-                    update({ marginPercent: parseNum(e.target.value, 30) })
-                  }
+                  onValueChange={(v) => update({ marginPercent: v })}
+                  integer
                   className="mt-1 font-mono"
                 />
               </div>
@@ -210,15 +181,10 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Desconto promo padrão (%)
                 </Label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={50}
-                  step={1}
+                <DecimalInput
                   value={prefs.promoDiscount}
-                  onChange={(e) =>
-                    update({ promoDiscount: parseNum(e.target.value, 10) })
-                  }
+                  onValueChange={(v) => update({ promoDiscount: v })}
+                  integer
                   className="mt-1 font-mono"
                 />
               </div>
@@ -236,15 +202,10 @@ export default function PreferenciasPage() {
                   <Label className="text-xs text-muted-foreground">
                     Taxa do cartão padrão (%)
                   </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={20}
-                    step={0.01}
-                    value={prefs.cardRatePercent || ''}
-                    onChange={(e) =>
-                      update({ cardRatePercent: parseNum(e.target.value, 0) })
-                    }
+                  <DecimalInput
+                    value={prefs.cardRatePercent}
+                    onValueChange={(v) => update({ cardRatePercent: v })}
+                    hideZero
                     placeholder="0"
                     className="mt-1 font-mono"
                   />
@@ -253,17 +214,9 @@ export default function PreferenciasPage() {
                   <Label className="text-xs text-muted-foreground">
                     Desconto Pix padrão (%)
                   </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={20}
-                    step={1}
+                  <DecimalInput
                     value={prefs.pixDiscountPercent}
-                    onChange={(e) =>
-                      update({
-                        pixDiscountPercent: parseNum(e.target.value, 0),
-                      })
-                    }
+                    onValueChange={(v) => update({ pixDiscountPercent: v })}
                     className="mt-1 font-mono"
                   />
                 </div>
@@ -272,14 +225,9 @@ export default function PreferenciasPage() {
                 <Label className="text-xs text-muted-foreground">
                   Mão de obra padrão (R$/h)
                 </Label>
-                <Input
-                  type="number"
-                  min={0}
-                  step={1}
+                <DecimalInput
                   value={prefs.laborCostPerHour}
-                  onChange={(e) =>
-                    update({ laborCostPerHour: parseNum(e.target.value, 0) })
-                  }
+                  onValueChange={(v) => update({ laborCostPerHour: v })}
                   className="mt-1 font-mono w-32"
                 />
               </div>

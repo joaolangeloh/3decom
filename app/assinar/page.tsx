@@ -72,7 +72,7 @@ export default async function AssinarPage() {
         {/* Plans grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Anual — destaque */}
-          <div className="bg-gradient-to-br from-[rgba(0,229,160,0.07)] to-[#13131f] border border-[rgba(0,229,160,0.3)] rounded-3xl p-8 relative overflow-hidden transition-all hover:-translate-y-1 order-1">
+          <div className="bg-gradient-to-br from-[rgba(0,229,160,0.07)] to-[#13131f] border border-[rgba(0,229,160,0.3)] rounded-3xl p-5 sm:p-8 relative overflow-hidden transition-all hover:-translate-y-1 order-1">
             <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#00e5a0] to-[#00c87a]" />
             <span className="absolute top-4 right-4 bg-[#00e5a0] text-black font-mono text-[9px] font-bold tracking-[1px] px-2.5 py-1 rounded-full uppercase">
               MELHOR VALOR
@@ -82,7 +82,7 @@ export default async function AssinarPage() {
             </div>
             <div className="flex items-baseline gap-1 mb-1.5">
               <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
-              <span className="text-[clamp(44px,8vw,64px)] font-extrabold tracking-[-3px] text-white">
+              <span className="text-[clamp(36px,8vw,56px)] font-extrabold tracking-[-3px] text-white">
                 290
               </span>
               <span className="font-mono text-[13px] text-[#555578]">/ano</span>
@@ -134,13 +134,13 @@ export default async function AssinarPage() {
           </div>
 
           {/* Mensal */}
-          <div className="bg-[#13131f] border border-[#1e1e30] rounded-3xl p-8 relative overflow-hidden transition-all hover:-translate-y-1 order-2">
+          <div className="bg-[#13131f] border border-[#1e1e30] rounded-3xl p-5 sm:p-8 relative overflow-hidden transition-all hover:-translate-y-1 order-2">
             <div className="font-mono text-[10px] tracking-[2px] uppercase text-[#555578] mb-4">
               Plano Mensal
             </div>
             <div className="flex items-baseline gap-1 mb-1.5">
               <span className="text-lg font-bold text-[#b0b0cc]">R$</span>
-              <span className="text-[clamp(44px,8vw,64px)] font-extrabold tracking-[-3px] text-white">
+              <span className="text-[clamp(36px,8vw,56px)] font-extrabold tracking-[-3px] text-white">
                 29
               </span>
               <span className="font-mono text-[13px] text-[#555578]">

@@ -18,6 +18,7 @@ import { PriceBreakdown } from './price-breakdown'
 import { saveCalculation } from '@/app/(protected)/calculadora/actions'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { DecimalInput } from '@/components/ui/decimal-input'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -425,15 +426,40 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
 
   // ---- Handlers ----
 
-  function parseNum(val: string, fallback: number): number {
-    const n = parseFloat(val)
-    return isNaN(n) ? fallback : n
-  }
+  // ---- Validation: required fields ----
 
-  function parseIntNum(val: string, fallback: number): number {
-    const n = parseInt(val, 10)
-    return isNaN(n) ? fallback : n
-  }
+  const missingFields = useMemo(() => {
+    const m = new Set<string>()
+
+    // Shipping required for ML
+    if (marketplaceType === 'mercadolivre') {
+      if (!manualShippingEnabled && shippingWeightKg <= 0) m.add('shippingWeight')
+      if (manualShippingEnabled && manualShippingValue <= 0) m.add('manualShipping')
+    }
+
+    // Sale price required when in sale-price mode for 3D
+    if (pricingMode === 'sale-price' && salePrice <= 0 && productType === '3d') {
+      m.add('salePrice')
+    }
+
+    // 3D product: print time + filament required
+    if (productType === '3d') {
+      if (printHours <= 0 && printMinutes <= 0) m.add('printTime')
+      if (filamentWeightGrams <= 0) m.add('filamentWeight')
+    }
+
+    // Normal product: supplier cost / target price required
+    if (productType === 'normal') {
+      if (normalMode === 'pv' && supplierCost <= 0) m.add('supplierCost')
+      if (normalMode === 'cf' && cfTargetPrice <= 0) m.add('cfTargetPrice')
+    }
+
+    return m
+  }, [
+    marketplaceType, manualShippingEnabled, shippingWeightKg, manualShippingValue,
+    pricingMode, salePrice, productType, printHours, printMinutes,
+    filamentWeightGrams, normalMode, supplierCost, cfTargetPrice,
+  ])
 
   function handleSave(productName: string) {
     setSaved(false)
@@ -459,13 +485,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
   // ---- Render ----
 
   return (
-    <div
-      className="grid gap-6 lg:grid-cols-[1fr_380px]"
-      onFocusCapture={(e) => {
-        const t = e.target as HTMLInputElement
-        if (t.tagName === 'INPUT' && t.type === 'number') t.select()
-      }}
-    >
+    <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       {/* Left Column - Form */}
       <div className="space-y-6">
         {/* Section 0: Product Type */}
@@ -621,15 +641,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       <Label className="text-xs text-muted-foreground">
                         Taxa de comissão (%)
                       </Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        max={50}
-                        step={0.5}
+                      <DecimalInput
                         value={mlCustomRate ?? 12}
-                        onChange={(e) =>
-                          setMlCustomRate(parseNum(e.target.value, 12))
-                        }
+                        onValueChange={(v) => setMlCustomRate(v)}
                         className="mt-1 font-mono w-32"
                       />
                     </div>
@@ -644,17 +658,13 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <Label className="text-xs text-muted-foreground">
-                        Peso com embalagem (kg)
+                        Peso com embalagem (kg) *
                       </Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step={0.1}
+                      <DecimalInput
                         value={shippingWeightKg}
-                        onChange={(e) =>
-                          setShippingWeightKg(parseNum(e.target.value, 0))
-                        }
+                        onValueChange={setShippingWeightKg}
                         className="mt-1 font-mono"
+                        aria-invalid={missingFields.has('shippingWeight')}
                       />
                     </div>
                     <div>
@@ -696,16 +706,13 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       />
                     </div>
                     {manualShippingEnabled && (
-                      <Input
-                        type="number"
-                        min={0}
-                        step={0.01}
+                      <DecimalInput
                         placeholder="Valor do frete (R$)"
-                        value={manualShippingValue || ''}
-                        onChange={(e) =>
-                          setManualShippingValue(parseNum(e.target.value, 0))
-                        }
+                        value={manualShippingValue}
+                        onValueChange={setManualShippingValue}
+                        hideZero
                         className="font-mono"
+                        aria-invalid={missingFields.has('manualShipping')}
                       />
                     )}
                   </div>
@@ -824,19 +831,15 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                         R$ fixo
                       </button>
                     </div>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={shopeeCouponType === 'percent' ? 1 : 0.5}
+                    <DecimalInput
                       placeholder={
                         shopeeCouponType === 'percent'
                           ? 'Desconto em %'
                           : 'Desconto em R$'
                       }
-                      value={shopeeCouponValue || ''}
-                      onChange={(e) =>
-                        setShopeeCouponValue(parseNum(e.target.value, 0))
-                      }
+                      value={shopeeCouponValue}
+                      onValueChange={setShopeeCouponValue}
+                      hideZero
                       className="font-mono"
                     />
                   </div>
@@ -912,15 +915,14 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
 
               {pricingMode === 'sale-price' ? (
                 <div>
-                  <Label>Preço de venda (R$)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    value={salePrice || ''}
-                    onChange={(e) => setSalePrice(parseNum(e.target.value, 0))}
+                  <Label>Preço de venda (R$) *</Label>
+                  <DecimalInput
+                    value={salePrice}
+                    onValueChange={setSalePrice}
+                    hideZero
                     placeholder="0,00"
                     className="mt-1.5 font-mono text-lg"
+                    aria-invalid={missingFields.has('salePrice')}
                   />
                 </div>
               ) : (
@@ -963,15 +965,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   <Label className="text-xs text-muted-foreground">
                     Desconto da promoção (%)
                   </Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={50}
-                    step={1}
+                  <DecimalInput
                     value={promoDiscount}
-                    onChange={(e) =>
-                      setPromoDiscount(parseIntNum(e.target.value, 10))
-                    }
+                    onValueChange={setPromoDiscount}
+                    integer
                     className="mt-1 font-mono w-24"
                   />
                 </div>
@@ -1014,15 +1011,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       <Label className="text-xs text-muted-foreground">
                         Consumo médio (kWh/h)
                       </Label>
-                      <Input
-                        type="number"
-                        min={0.01}
-                        max={5}
-                        step={0.01}
+                      <DecimalInput
                         value={customPrinterKw}
-                        onChange={(e) =>
-                          setCustomPrinterKw(parseNum(e.target.value, 0.1))
-                        }
+                        onValueChange={setCustomPrinterKw}
                         className="mt-1 font-mono w-36"
                       />
                     </div>
@@ -1032,45 +1023,35 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
-                      Horas de impressão
+                      Horas de impressão *
                     </Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={1}
+                    <DecimalInput
                       value={printHours}
-                      onChange={(e) =>
-                        setPrintHours(parseIntNum(e.target.value, 0))
-                      }
+                      onValueChange={setPrintHours}
+                      integer
                       className="mt-1.5 font-mono"
+                      aria-invalid={missingFields.has('printTime')}
                     />
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
                       Minutos de impressão
                     </Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={59}
-                      step={1}
+                    <DecimalInput
                       value={printMinutes}
-                      onChange={(e) =>
-                        setPrintMinutes(parseIntNum(e.target.value, 0))
-                      }
+                      onValueChange={setPrintMinutes}
+                      integer
                       className="mt-1.5 font-mono"
+                      aria-invalid={missingFields.has('printTime')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <Label>Valor do kWh (R$)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={0.01}
+                  <DecimalInput
                     value={kwhPrice}
-                    onChange={(e) => setKwhPrice(parseNum(e.target.value, 0))}
+                    onValueChange={setKwhPrice}
                     className="mt-1.5 font-mono"
                   />
                   <p className="text-[10px] text-muted-foreground mt-1">
@@ -1096,14 +1077,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
                       R$
                     </span>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={1}
+                    <DecimalInput
                       value={filamentPricePerKg}
-                      onChange={(e) =>
-                        setFilamentPricePerKg(parseNum(e.target.value, 0))
-                      }
+                      onValueChange={setFilamentPricePerKg}
                       className="font-mono pl-8 pr-10"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
@@ -1113,19 +1089,16 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                 </div>
                 <div>
                   <Label className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
-                    Peso usado na peça
+                    Peso usado na peça *
                   </Label>
                   <div className="relative mt-1.5">
-                    <Input
-                      type="number"
-                      min={0}
-                      step={1}
-                      value={filamentWeightGrams || ''}
-                      onChange={(e) =>
-                        setFilamentWeightGrams(parseNum(e.target.value, 0))
-                      }
+                    <DecimalInput
+                      value={filamentWeightGrams}
+                      onValueChange={setFilamentWeightGrams}
+                      hideZero
                       className="font-mono pr-8"
                       placeholder="0"
+                      aria-invalid={missingFields.has('filamentWeight')}
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
                       g
@@ -1176,15 +1149,14 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
               {normalMode === 'pv' && (
                 <div className="space-y-4">
                   <div>
-                    <Label>Custo do fornecedor (R$)</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={0.01}
-                      value={supplierCost || ''}
-                      onChange={(e) => setSupplierCost(parseNum(e.target.value, 0))}
+                    <Label>Custo do fornecedor (R$) *</Label>
+                    <DecimalInput
+                      value={supplierCost}
+                      onValueChange={setSupplierCost}
+                      hideZero
                       placeholder="0,00"
                       className="mt-1.5 font-mono text-lg"
+                      aria-invalid={missingFields.has('supplierCost')}
                     />
                   </div>
                   <div>
@@ -1224,15 +1196,14 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
               {normalMode === 'cf' && (
                 <div className="space-y-4">
                   <div>
-                    <Label>Preço de venda alvo (R$)</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={0.01}
-                      value={cfTargetPrice || ''}
-                      onChange={(e) => setCfTargetPrice(parseNum(e.target.value, 0))}
+                    <Label>Preço de venda alvo (R$) *</Label>
+                    <DecimalInput
+                      value={cfTargetPrice}
+                      onValueChange={setCfTargetPrice}
+                      hideZero
                       placeholder="0,00"
                       className="mt-1.5 font-mono text-lg"
+                      aria-invalid={missingFields.has('cfTargetPrice')}
                     />
                   </div>
                   <div>
@@ -1302,15 +1273,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     Imposto (alíquota)
                   </Label>
                   <div className="relative mt-1.5">
-                    <Input
-                      type="number"
-                      min={0}
-                      max={50}
-                      step={0.5}
+                    <DecimalInput
                       value={taxPercent}
-                      onChange={(e) =>
-                        setTaxPercent(parseNum(e.target.value, 0))
-                      }
+                      onValueChange={setTaxPercent}
                       className="font-mono pr-8"
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
@@ -1329,14 +1294,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
                       R$
                     </span>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={0.5}
-                      value={packagingCost || ''}
-                      onChange={(e) =>
-                        setPackagingCost(parseNum(e.target.value, 0))
-                      }
+                    <DecimalInput
+                      value={packagingCost}
+                      onValueChange={setPackagingCost}
+                      hideZero
                       className="font-mono pl-8"
                       placeholder="0,00"
                     />
@@ -1352,14 +1313,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
                     R$
                   </span>
-                  <Input
-                    type="number"
-                    min={0}
-                    step={0.5}
-                    value={otherCosts || ''}
-                    onChange={(e) =>
-                      setOtherCosts(parseNum(e.target.value, 0))
-                    }
+                  <DecimalInput
+                    value={otherCosts}
+                    onValueChange={setOtherCosts}
+                    hideZero
                     className="font-mono pl-8"
                     placeholder="0,00"
                   />
@@ -1377,14 +1334,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       <Label className="text-xs text-muted-foreground">
                         Custo/hora (R$)
                       </Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step={1}
+                      <DecimalInput
                         value={laborCostPerHour}
-                        onChange={(e) =>
-                          setLaborCostPerHour(parseNum(e.target.value, 0))
-                        }
+                        onValueChange={setLaborCostPerHour}
                         className="mt-1 font-mono"
                       />
                     </div>
@@ -1392,14 +1344,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       <Label className="text-xs text-muted-foreground">
                         Tempo (min)
                       </Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step={5}
+                      <DecimalInput
                         value={laborMinutes}
-                        onChange={(e) =>
-                          setLaborMinutes(parseIntNum(e.target.value, 0))
-                        }
+                        onValueChange={setLaborMinutes}
+                        integer
                         className="mt-1 font-mono"
                       />
                     </div>
@@ -1496,15 +1444,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                           </button>
                         </div>
                         {!isPresetRate && (
-                          <Input
-                            type="number"
-                            min={0}
-                            max={20}
-                            step={0.01}
-                            value={cardRatePercent || ''}
-                            onChange={(e) =>
-                              setCardRatePercent(parseNum(e.target.value, 0))
-                            }
+                          <DecimalInput
+                            value={cardRatePercent}
+                            onValueChange={setCardRatePercent}
+                            hideZero
                             placeholder="0,00"
                             className="mt-2 font-mono w-32"
                           />
@@ -1529,15 +1472,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                         Desconto Pix (% menor que cartão)
                       </Label>
                       <div className="relative mt-1">
-                        <Input
-                          type="number"
-                          min={0}
-                          max={20}
-                          step={1}
+                        <DecimalInput
                           value={pixDiscountPercent}
-                          onChange={(e) =>
-                            setPixDiscountPercent(parseNum(e.target.value, 0))
-                          }
+                          onValueChange={setPixDiscountPercent}
                           className="font-mono pr-8"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">
