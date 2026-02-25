@@ -86,6 +86,7 @@ export type Database = {
           current_period_end: string | null
           id: string
           lastlink_subscription_id: string | null
+          plan: string
           status: string
           updated_at: string | null
           user_id: string
@@ -95,6 +96,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           lastlink_subscription_id?: string | null
+          plan?: string
           status?: string
           updated_at?: string | null
           user_id: string
@@ -104,6 +106,7 @@ export type Database = {
           current_period_end?: string | null
           id?: string
           lastlink_subscription_id?: string | null
+          plan?: string
           status?: string
           updated_at?: string | null
           user_id?: string

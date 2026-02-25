@@ -100,10 +100,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, note: `unhandled event: ${event}` })
   }
 
-  // Determine plan duration: compare Offer URL against annual URL
+  // Determine plan duration: compare Offer URL against annual URLs
   const annualUrl = process.env.NEXT_PUBLIC_LASTLINK_ANNUAL_URL?.replace(/\/+$/, '')
   const offerUrl = body.Data?.Offer?.Url?.replace(/\/+$/, '')
-  const isAnnual = annualUrl && offerUrl === annualUrl
+  // TODO: remove hardcoded legacy URL once migrated
+  const annualUrls = [annualUrl, 'https://lastlink.com/p/C47CC5631'].filter(Boolean)
+  const isAnnual = !!(offerUrl && annualUrls.includes(offerUrl))
+  const plan = isAnnual ? 'annual' : 'monthly'
   const periodDays = isAnnual ? 367 : 32 // 367 days for annual, 32 for monthly
 
   const currentPeriodEnd =
@@ -123,6 +126,7 @@ export async function POST(req: Request) {
       .from('subscriptions')
       .update({
         status,
+        plan,
         lastlink_subscription_id: subscriptionId || undefined,
         current_period_end: currentPeriodEnd,
         updated_at: new Date().toISOString(),
@@ -132,6 +136,7 @@ export async function POST(req: Request) {
     await supabaseAdmin.from('subscriptions').insert({
       user_id: profile.id,
       status,
+      plan,
       lastlink_subscription_id: subscriptionId,
       current_period_end: currentPeriodEnd,
     })

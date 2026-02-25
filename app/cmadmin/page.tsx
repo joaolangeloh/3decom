@@ -27,7 +27,7 @@ type User = {
   createdAt: string | null
 }
 
-type Filter = 'all' | 'activated' | 'not-activated' | 'subscribers' | 'inactive' | 'guests'
+type Filter = 'all' | 'activated' | 'not-activated' | 'subscribers' | 'inactive' | 'guests' | 'monthly' | 'annual'
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -89,6 +89,12 @@ export default function AdminPage() {
       case 'guests':
         result = result.filter((u) => u.planType === 'Convidado')
         break
+      case 'monthly':
+        result = result.filter((u) => u.planType === 'Mensal')
+        break
+      case 'annual':
+        result = result.filter((u) => u.planType === 'Anual')
+        break
     }
 
     return result
@@ -103,7 +109,9 @@ export default function AdminPage() {
       (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active'
     ).length
     const guests = users.filter((u) => u.planType === 'Convidado').length
-    return { total, activated, notActivated, activeSubscriptions, inactiveSubscriptions, guests }
+    const monthly = users.filter((u) => u.planType === 'Mensal').length
+    const annual = users.filter((u) => u.planType === 'Anual').length
+    return { total, activated, notActivated, activeSubscriptions, inactiveSubscriptions, guests, monthly, annual }
   }, [users])
 
   function formatDate(date: string | null) {
@@ -155,7 +163,7 @@ export default function AdminPage() {
       <h1 className="mb-6 text-2xl font-bold text-white">Admin Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">
         <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
           <CardContent className="pt-4">
             <p className="text-sm text-gray-400">Total</p>
@@ -188,6 +196,18 @@ export default function AdminPage() {
         </Card>
         <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
           <CardContent className="pt-4">
+            <p className="text-sm text-gray-400">Mensais</p>
+            <p className="text-2xl font-bold text-blue-400">{stats.monthly}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
+          <CardContent className="pt-4">
+            <p className="text-sm text-gray-400">Anuais</p>
+            <p className="text-2xl font-bold text-purple-400">{stats.annual}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
+          <CardContent className="pt-4">
             <p className="text-sm text-gray-400">Convidados</p>
             <p className="text-2xl font-bold text-gray-400">{stats.guests}</p>
           </CardContent>
@@ -209,6 +229,8 @@ export default function AdminPage() {
             ['not-activated', 'Não Ativados'],
             ['subscribers', 'Assinantes'],
             ['inactive', 'Inativos'],
+            ['monthly', 'Mensais'],
+            ['annual', 'Anuais'],
             ['guests', 'Convidados'],
           ] as [Filter, string][]).map(([key, label]) => (
             <Button
@@ -286,9 +308,11 @@ export default function AdminPage() {
                     <Badge
                       variant="outline"
                       className={
-                        user.planType === 'Mensal'
-                          ? 'border-[#00e5a0]/30 text-[#00e5a0]'
-                          : 'border-[#1a1a2e] text-gray-500'
+                        user.planType === 'Anual'
+                          ? 'border-purple-500/30 text-purple-400'
+                          : user.planType === 'Mensal'
+                            ? 'border-blue-500/30 text-blue-400'
+                            : 'border-[#1a1a2e] text-gray-500'
                       }
                     >
                       {user.planType}

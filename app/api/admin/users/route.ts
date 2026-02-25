@@ -17,7 +17,7 @@ export async function GET() {
   // Fetch all subscriptions
   const { data: subscriptions } = await supabaseAdmin
     .from('subscriptions')
-    .select('user_id, status, current_period_end, created_at')
+    .select('user_id, status, plan, current_period_end, created_at')
 
   // Merge data
   const users = (profiles || []).map((profile) => {
@@ -34,9 +34,11 @@ export async function GET() {
       planType:
         subscription?.status === 'active' && !subscription?.current_period_end
           ? 'Convidado'
-          : subscription
-            ? 'Mensal'
-            : 'Convidado',
+          : subscription?.plan === 'annual'
+            ? 'Anual'
+            : subscription
+              ? 'Mensal'
+              : 'Convidado',
       createdAt: profile.created_at,
     }
   })
