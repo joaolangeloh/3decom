@@ -100,39 +100,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, note: `unhandled event: ${event}` })
   }
 
-  // Determine plan duration: compare Offer URL against annual URLs
-  const annualUrl = process.env.NEXT_PUBLIC_LASTLINK_ANNUAL_URL?.replace(/\/+$/, '')
-  const offerUrl = body.Data?.Offer?.Url?.replace(/\/+$/, '')
-  // TODO: remove hardcoded legacy URL once migrated
-  const annualUrls = [annualUrl, 'https://lastlink.com/p/C47CC5631'].filter(Boolean)
-  const isAnnual = !!(offerUrl && annualUrls.includes(offerUrl))
+  // Determine plan by Offer ID
+  const annualOfferId = process.env.LASTLINK_ANNUAL_OFFER_ID
+  const offerId = body.Data?.Offer?.Id ?? ''
+  // TODO: remove test offer ID once done testing
+  const annualOfferIds = [annualOfferId, '9fc54649-6646-4af6-834e-1e201f8c3b47'].filter(Boolean)
+  const isAnnual = annualOfferIds.includes(offerId)
   const plan = isAnnual ? 'annual' : 'monthly'
   const periodDays = isAnnual ? 367 : 32 // 367 days for annual, 32 for monthly
-
-  console.log('[webhook] plan detection:', JSON.stringify({
-    annualUrl,
-    offerUrl,
-    annualUrls,
-    isAnnual,
-    plan,
-    periodDays,
-    offerRaw: body.Data?.Offer,
-  }))
 
   const currentPeriodEnd =
     status === 'active'
       ? new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000).toISOString()
       : null
-
-  console.log('[webhook] resolved values:', JSON.stringify({
-    email,
-    event,
-    status,
-    plan,
-    currentPeriodEnd,
-    subscriptionId,
-    profileId: profile.id,
-  }))
 
   // Upsert: update if exists, or create subscription record
   const { data: existing } = await supabaseAdmin
@@ -141,10 +121,8 @@ export async function POST(req: Request) {
     .eq('user_id', profile.id)
     .single()
 
-  console.log('[webhook] existing subscription:', JSON.stringify(existing))
-
   if (existing) {
-    const { data: updateData, error: updateError } = await supabaseAdmin
+    await supabaseAdmin
       .from('subscriptions')
       .update({
         status,
@@ -154,26 +132,15 @@ export async function POST(req: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', profile.id)
-      .select()
-
-    console.log('[webhook] update result:', JSON.stringify({ updateData, updateError }))
   } else if (status === 'active') {
-    const { data: insertData, error: insertError } = await supabaseAdmin
-      .from('subscriptions')
-      .insert({
-        user_id: profile.id,
-        status,
-        plan,
-        lastlink_subscription_id: subscriptionId,
-        current_period_end: currentPeriodEnd,
-      })
-      .select()
-
-    console.log('[webhook] insert result:', JSON.stringify({ insertData, insertError }))
-  } else {
-    console.log('[webhook] no subscription found and status is not active, skipping DB write')
+    await supabaseAdmin.from('subscriptions').insert({
+      user_id: profile.id,
+      status,
+      plan,
+      lastlink_subscription_id: subscriptionId,
+      current_period_end: currentPeriodEnd,
+    })
   }
 
-  console.log('[webhook] done, returning status:', status)
-  return NextResponse.json({ ok: true, status, plan, isAnnual })
+  return NextResponse.json({ ok: true, status })
 }
