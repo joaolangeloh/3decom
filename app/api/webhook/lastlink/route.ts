@@ -109,10 +109,30 @@ export async function POST(req: Request) {
   const plan = isAnnual ? 'annual' : 'monthly'
   const periodDays = isAnnual ? 367 : 32 // 367 days for annual, 32 for monthly
 
+  console.log('[webhook] plan detection:', JSON.stringify({
+    annualUrl,
+    offerUrl,
+    annualUrls,
+    isAnnual,
+    plan,
+    periodDays,
+    offerRaw: body.Data?.Offer,
+  }))
+
   const currentPeriodEnd =
     status === 'active'
       ? new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000).toISOString()
       : null
+
+  console.log('[webhook] resolved values:', JSON.stringify({
+    email,
+    event,
+    status,
+    plan,
+    currentPeriodEnd,
+    subscriptionId,
+    profileId: profile.id,
+  }))
 
   // Upsert: update if exists, or create subscription record
   const { data: existing } = await supabaseAdmin
@@ -121,8 +141,10 @@ export async function POST(req: Request) {
     .eq('user_id', profile.id)
     .single()
 
+  console.log('[webhook] existing subscription:', JSON.stringify(existing))
+
   if (existing) {
-    await supabaseAdmin
+    const { data: updateData, error: updateError } = await supabaseAdmin
       .from('subscriptions')
       .update({
         status,
@@ -132,15 +154,26 @@ export async function POST(req: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', profile.id)
+      .select()
+
+    console.log('[webhook] update result:', JSON.stringify({ updateData, updateError }))
   } else if (status === 'active') {
-    await supabaseAdmin.from('subscriptions').insert({
-      user_id: profile.id,
-      status,
-      plan,
-      lastlink_subscription_id: subscriptionId,
-      current_period_end: currentPeriodEnd,
-    })
+    const { data: insertData, error: insertError } = await supabaseAdmin
+      .from('subscriptions')
+      .insert({
+        user_id: profile.id,
+        status,
+        plan,
+        lastlink_subscription_id: subscriptionId,
+        current_period_end: currentPeriodEnd,
+      })
+      .select()
+
+    console.log('[webhook] insert result:', JSON.stringify({ insertData, insertError }))
+  } else {
+    console.log('[webhook] no subscription found and status is not active, skipping DB write')
   }
 
-  return NextResponse.json({ ok: true, status })
+  console.log('[webhook] done, returning status:', status)
+  return NextResponse.json({ ok: true, status, plan, isAnnual })
 }
