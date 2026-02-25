@@ -13,6 +13,7 @@ interface LastlinkWebhook {
     Subscriptions?: { Id: string; ProductId: string }
     Products?: { Id: string; Name: string; Price: number }[]
     Purchase?: { PaymentId: string; Recurrency: boolean }
+    Offer?: { Id: string; Name: string; Url: string }
   }
 }
 
@@ -99,9 +100,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, note: `unhandled event: ${event}` })
   }
 
+  // Determine plan duration: compare Offer URL against annual URL
+  const annualUrl = process.env.NEXT_PUBLIC_LASTLINK_ANNUAL_URL?.replace(/\/+$/, '')
+  const offerUrl = body.Data?.Offer?.Url?.replace(/\/+$/, '')
+  const isAnnual = annualUrl && offerUrl === annualUrl
+  const periodDays = isAnnual ? 367 : 32 // 367 days for annual, 32 for monthly
+
   const currentPeriodEnd =
     status === 'active'
-      ? new Date(Date.now() + 32 * 24 * 60 * 60 * 1000).toISOString() // 32 days buffer
+      ? new Date(Date.now() + periodDays * 24 * 60 * 60 * 1000).toISOString()
       : null
 
   // Upsert: update if exists, or create subscription record
