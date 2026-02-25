@@ -31,7 +31,12 @@ export async function GET() {
       emailConfirmed: !!authUser?.email_confirmed_at,
       subscriptionStatus: subscription?.status || null,
       currentPeriodEnd: subscription?.current_period_end || null,
-      planType: subscription ? 'Mensal' : 'Convidado',
+      planType:
+        subscription?.status === 'active' && !subscription?.current_period_end
+          ? 'Convidado'
+          : subscription
+            ? 'Mensal'
+            : 'Convidado',
       createdAt: profile.created_at,
     }
   })

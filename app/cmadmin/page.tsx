@@ -87,7 +87,7 @@ export default function AdminPage() {
         )
         break
       case 'guests':
-        result = result.filter((u) => !u.subscriptionStatus)
+        result = result.filter((u) => u.planType === 'Convidado')
         break
     }
 
@@ -102,7 +102,7 @@ export default function AdminPage() {
     const inactiveSubscriptions = users.filter(
       (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active'
     ).length
-    const guests = users.filter((u) => !u.subscriptionStatus).length
+    const guests = users.filter((u) => u.planType === 'Convidado').length
     return { total, activated, notActivated, activeSubscriptions, inactiveSubscriptions, guests }
   }, [users])
 
