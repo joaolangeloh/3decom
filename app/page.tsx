@@ -655,8 +655,8 @@ export default function LandingPage() {
 
           <div className="max-w-[680px] mx-auto flex flex-col gap-1">
             <FaqItem
-              question="Preciso de cartão de crédito para testar?"
-              answer="Não. Os 7 dias de teste são completamente grátis e sem necessidade de cadastrar cartão. Você só fornece os dados de pagamento se decidir continuar após o período de teste."
+              question="E se eu não gostar do serviço?"
+              answer="Sem problema. Você tem garantia de reembolso de 7 dias. Se não ficar satisfeito, devolvemos 100% do valor pago — sem perguntas e sem burocracia."
             />
             <FaqItem
               question="As taxas são mesmo as oficiais de 2026?"
