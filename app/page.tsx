@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { fbq } from '@/lib/pixel'
+import { PixelTimeOnPage, PixelScrollDepth } from '@/components/pixel-events'
 
 // ============================================================
 // Intersection Observer hook for scroll animations
@@ -107,6 +109,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#060609] text-[#ededf8] overflow-x-hidden" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <PixelTimeOnPage />
+      <PixelScrollDepth />
 
       {/* ===== NAV ===== */}
       <nav className="fixed top-0 left-0 right-0 z-[1000] px-6 h-16 flex items-center justify-between bg-[rgba(6,6,9,0.9)] backdrop-blur-[16px] border-b border-white/[0.04]">
@@ -133,6 +137,7 @@ export default function LandingPage() {
           </Link>
           <a
             href="#precos"
+            onClick={() => fbq('trackCustom', 'ClickCTA', { content_name: 'Nav - Assinar Agora' })}
             className="bg-[#00e5a0] text-black font-extrabold text-[13px] px-5 py-2.5 rounded-[10px] hover:bg-[#00c87a] transition-all hover:-translate-y-px"
           >
             Assinar agora &rarr;
@@ -173,12 +178,14 @@ export default function LandingPage() {
         <div className="relative z-10 flex gap-3 items-center flex-wrap justify-center mb-12">
           <a
             href="#precos"
+            onClick={() => fbq('trackCustom', 'ClickCTA', { content_name: 'Hero - Ver Planos' })}
             className="bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black font-extrabold text-base px-9 py-[18px] rounded-[14px] inline-flex items-center gap-2.5 tracking-[-0.3px] transition-all hover:-translate-y-[3px] hover:shadow-[0_20px_50px_rgba(0,229,160,0.3)]"
           >
             &#128640; Ver planos e assinar
           </a>
           <a
             href="#funcoes"
+            onClick={() => fbq('trackCustom', 'ViewContent', { content_name: 'Como Funciona' })}
             className="text-[#b0b0cc] font-semibold text-[15px] px-7 py-[17px] rounded-[14px] border border-[#2a2a40] transition-all hover:text-[#ededf8] hover:bg-[#13131f]"
           >
             Ver como funciona
@@ -583,6 +590,7 @@ export default function LandingPage() {
               </div>
               <Link
                 href="/auth/cadastro"
+                onClick={() => fbq('trackCustom', 'ClickCTA', { content_name: 'Pricing - Plano Mensal', currency: 'BRL', value: 29 })}
                 className="block w-full text-center py-4 rounded-[13px] font-extrabold text-[15px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"
               >
                 &rarr; Assinar com garantia de 7 dias
@@ -630,6 +638,7 @@ export default function LandingPage() {
               </div>
               <Link
                 href="/auth/cadastro"
+                onClick={() => fbq('trackCustom', 'ClickCTA', { content_name: 'Pricing - Plano Anual', currency: 'BRL', value: 290 })}
                 className="block w-full text-center py-4 rounded-[13px] font-extrabold text-[15px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"
               >
                 &rarr; Assinar anual e economizar
@@ -697,6 +706,7 @@ export default function LandingPage() {
         </p>
         <a
           href="#precos"
+          onClick={() => fbq('trackCustom', 'ClickCTA', { content_name: 'Footer - Ver Planos' })}
           className="relative z-10 inline-flex bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black font-extrabold text-lg px-11 py-5 rounded-[14px] tracking-[-0.3px] transition-all hover:-translate-y-[3px] hover:shadow-[0_20px_50px_rgba(0,229,160,0.3)]"
         >
           &#128640; Ver planos e assinar

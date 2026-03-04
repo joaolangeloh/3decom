@@ -1,8 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { signup } from './actions'
+import { fbq } from '@/lib/pixel'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -17,6 +18,21 @@ import {
 
 export default function CadastroPage() {
   const [state, formAction, pending] = useActionState(signup, null)
+  const tracked = useRef(false)
+
+  // Track Lead event on page view
+  useEffect(() => {
+    if (tracked.current) return
+    tracked.current = true
+    fbq('track', 'Lead', { content_name: 'Cadastro' })
+  }, [])
+
+  // Track CompleteRegistration when form submits successfully
+  useEffect(() => {
+    if (state && !state.error) {
+      fbq('track', 'CompleteRegistration', { content_name: 'Cadastro' })
+    }
+  }, [state])
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

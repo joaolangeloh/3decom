@@ -1,5 +1,5 @@
-// Mercado Livre category commission rates (2026)
-// Source: doc 3DECOM + mercadolivre.com.br
+// Mercado Livre category commission rates (Feb 2026)
+// Source: API /sites/MLB/listing_prices — queried 2026-02-26
 // Pattern: Premium = Clássico + 5% always
 
 export interface MLCategory {
@@ -8,26 +8,52 @@ export interface MLCategory {
   premium: number // percentage
 }
 
-// Categories relevant for 3D printing / e-commerce sellers
+// All MLB categories — most relevant for 3D printing listed first
 export const ML_CATEGORIES: Record<string, MLCategory> = {
-  casa_moveis: { label: 'Casa, Móveis e Decoração', classico: 12.5, premium: 17.5 },
-  utilidades: { label: 'Utilidades Domésticas', classico: 12.5, premium: 17.5 },
-  brinquedos: { label: 'Brinquedos e Hobbies', classico: 12.5, premium: 17.5 },
+  // --- Most relevant for 3D printing ---
+  casa_moveis: { label: 'Casa, Móveis e Decoração', classico: 11.5, premium: 16.5 },
+  arte_papelaria: { label: 'Arte, Papelaria e Armarinho', classico: 11.5, premium: 16.5 },
+  brinquedos: { label: 'Brinquedos e Hobbies', classico: 11.5, premium: 16.5 },
   festas: { label: 'Festas e Lembrancinhas', classico: 12, premium: 17 },
-  ferramentas: { label: 'Ferramentas e Construção', classico: 12, premium: 17 },
-  veiculos: { label: 'Acessórios para Veículos', classico: 11.5, premium: 16.5 },
-  eletronicos: { label: 'Eletrônicos', classico: 11.5, premium: 16.5 },
-  games: { label: 'Games', classico: 11, premium: 16 },
+  ferramentas: { label: 'Ferramentas', classico: 12, premium: 17 },
+  construcao: { label: 'Construção', classico: 12, premium: 17 },
+  industria: { label: 'Indústria e Comércio', classico: 12, premium: 17 },
+  bebes: { label: 'Bebês', classico: 11.5, premium: 16.5 },
+  // --- Other categories ---
+  veiculos: { label: 'Acessórios para Veículos', classico: 12, premium: 17 },
+  agro: { label: 'Agro', classico: 9, premium: 14 },
+  alimentos: { label: 'Alimentos e Bebidas', classico: 14, premium: 19 },
+  animais: { label: 'Animais', classico: 12.5, premium: 17.5 },
+  antiguidades: { label: 'Antiguidades e Coleções', classico: 11.5, premium: 16.5 },
+  beleza: { label: 'Beleza e Cuidado Pessoal', classico: 12, premium: 17 },
+  calcados_roupas: { label: 'Calçados, Roupas e Bolsas', classico: 14, premium: 19 },
+  cameras: { label: 'Câmeras e Acessórios', classico: 13, premium: 18 },
+  celulares: { label: 'Celulares e Telefones', classico: 13, premium: 18 },
+  eletrodomesticos: { label: 'Eletrodomésticos', classico: 13, premium: 18 },
+  eletronicos: { label: 'Eletrônicos, Áudio e Vídeo', classico: 13, premium: 18 },
+  esportes: { label: 'Esportes e Fitness', classico: 12.5, premium: 17.5 },
+  games: { label: 'Games', classico: 13, premium: 18 },
+  informatica: { label: 'Informática', classico: 13, premium: 18 },
+  instrumentos: { label: 'Instrumentos Musicais', classico: 11.5, premium: 16.5 },
+  joias: { label: 'Joias e Relógios', classico: 12.5, premium: 17.5 },
+  livros: { label: 'Livros, Revistas e Comics', classico: 12, premium: 17 },
+  musica_filmes: { label: 'Música, Filmes e Seriados', classico: 12, premium: 17 },
+  saude: { label: 'Saúde', classico: 12, premium: 17 },
+  outros: { label: 'Mais Categorias', classico: 12, premium: 17 },
 }
 
 // Default category for 3D printing (Casa, Móveis e Decoração)
 export const ML_DEFAULT_CATEGORY = 'casa_moveis'
 
-// Mercado Livre fixed fee: R$0.49 per unit for products < R$12.50
-// Source: doc 3DECOM
+// Mercado Livre fixed fee tiers (Feb 2026)
+// Source: API /sites/MLB/listing_prices — queried 2026-02-26
+// Note: varies by logistic_type; these are defaults (without logistic_type param)
 export function getMLFixedFee(salePrice: number): number {
-  if (salePrice < 12.5) return 0.49
-  return 0
+  if (salePrice >= 79) return 0
+  if (salePrice >= 50) return 6.75
+  if (salePrice >= 29) return 6.50
+  if (salePrice >= 12.51) return 6.25
+  return Math.round((salePrice * 0.50 - 0.01) * 100) / 100
 }
 
 // Shopee commission tiers (March 2026)

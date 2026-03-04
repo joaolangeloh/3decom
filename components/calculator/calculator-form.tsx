@@ -138,7 +138,6 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     'none' | 'mercadolivre' | 'shopee'
   >('mercadolivre')
   const [mlAdType, setMlAdType] = useState<'classico' | 'premium'>('classico')
-  const [mlParcelamento, setMlParcelamento] = useState(false)
   const [mlCategory, setMlCategory] = useState(ML_DEFAULT_CATEGORY)
   const [mlCustomRate, setMlCustomRate] = useState<number | null>(null)
   const [shopeeSellerType, setShopeeSellerType] = useState<'cpf' | 'cnpj'>(
@@ -180,6 +179,12 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
   const [printHours, setPrintHours] = useState(0)
   const [printMinutes, setPrintMinutes] = useState(0)
   const [kwhPrice, setKwhPrice] = useState(prefs.kwhPrice)
+
+  // Multiple pieces per plate
+  const [multiplePieces, setMultiplePieces] = useState(false)
+  const [piecesOnPlate, setPiecesOnPlate] = useState(2)
+  const [dividePrintTime, setDividePrintTime] = useState(true)
+  const [divideFilament, setDivideFilament] = useState(true)
 
   // Filament
   const [filamentPricePerKg, setFilamentPricePerKg] = useState(
@@ -234,7 +239,6 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     // Marketplace
     setMarketplaceType(mp?.type ?? 'mercadolivre')
     setMlAdType(mp?.mlAdType ?? 'classico')
-    setMlParcelamento(mp?.mlParcelamento ?? false)
     setMlCategory(mp?.mlCategory ?? ML_DEFAULT_CATEGORY)
     setMlCustomRate(mp?.mlCustomRate ?? null)
     setShopeeSellerType(mp?.shopeeSellerType ?? 'cnpj')
@@ -269,6 +273,13 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     setPrintMinutes(d.printMinutes ?? 0)
     setKwhPrice(d.kwhPrice ?? prefs.kwhPrice)
 
+    // Multiple pieces
+    const hasPieces = (d.piecesOnPlate ?? 1) > 1
+    setMultiplePieces(hasPieces)
+    setPiecesOnPlate(d.piecesOnPlate ?? 2)
+    setDividePrintTime(d.dividePrintTime ?? true)
+    setDivideFilament(d.divideFilament ?? true)
+
     // Filament
     setFilamentPricePerKg(d.filamentPricePerKg ?? prefs.filamentPricePerKg)
     setFilamentWeightGrams(d.filamentWeightGrams ?? 0)
@@ -294,7 +305,6 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     () => ({
       type: marketplaceType,
       mlAdType,
-      mlParcelamento: mlAdType === 'premium' ? mlParcelamento : false,
       mlCategory: isCustomCategory ? undefined : mlCategory,
       mlCustomRate: isCustomCategory ? (mlCustomRate ?? undefined) : undefined,
       shopeeSellerType,
@@ -306,7 +316,6 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     [
       marketplaceType,
       mlAdType,
-      mlParcelamento,
       mlCategory,
       isCustomCategory,
       mlCustomRate,
@@ -355,6 +364,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
       printHours: productType === '3d' ? printHours : 0,
       printMinutes: productType === '3d' ? printMinutes : 0,
       kwhPrice,
+      piecesOnPlate: multiplePieces ? piecesOnPlate : 1,
+      dividePrintTime: multiplePieces && dividePrintTime,
+      divideFilament: multiplePieces && divideFilament,
       filamentPricePerKg,
       filamentWeightGrams: productType === '3d' ? filamentWeightGrams : 0,
       supplierCost: productType === 'normal' ? supplierCost : 0,
@@ -379,6 +391,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
       printHours,
       printMinutes,
       kwhPrice,
+      multiplePieces,
+      piecesOnPlate,
+      dividePrintTime,
+      divideFilament,
       filamentPricePerKg,
       filamentWeightGrams,
       supplierCost,
@@ -562,7 +578,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
-                      onClick={() => { setMlAdType('classico'); setMlParcelamento(false) }}
+                      onClick={() => setMlAdType('classico')}
                       className={`rounded-lg border p-3 text-left transition-all cursor-pointer ${
                         mlAdType === 'classico'
                           ? 'border-accent bg-accent/10'
@@ -593,20 +609,6 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                       </span>
                     </button>
                   </div>
-                  {mlAdType === 'premium' && (
-                    <div className="flex items-center justify-between mt-3">
-                      <div>
-                        <p className="text-sm">Parcelamento (até 18x)?</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          +2,99% taxa de antecipação
-                        </p>
-                      </div>
-                      <Switch
-                        checked={mlParcelamento}
-                        onCheckedChange={setMlParcelamento}
-                      />
-                    </div>
-                  )}
                 </div>
 
                 {/* Category */}
@@ -1046,6 +1048,54 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     />
                   </div>
                 </div>
+
+                {/* Multiple pieces per plate */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm">Múltiplas peças na mesa?</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Divide o custo por peça automaticamente
+                    </p>
+                  </div>
+                  <Switch
+                    checked={multiplePieces}
+                    onCheckedChange={setMultiplePieces}
+                  />
+                </div>
+                {multiplePieces && (
+                  <div className="pl-4 border-l-2 border-accent/20 space-y-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
+                        Peças na mesa
+                      </Label>
+                      <DecimalInput
+                        value={piecesOnPlate}
+                        onValueChange={(v) => setPiecesOnPlate(Math.max(2, v))}
+                        integer
+                        className="mt-1.5 font-mono w-24"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">
+                        Dividir por peças
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Tempo de impressão</span>
+                        <Switch
+                          checked={dividePrintTime}
+                          onCheckedChange={setDividePrintTime}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm">Filamento</span>
+                        <Switch
+                          checked={divideFilament}
+                          onCheckedChange={setDivideFilament}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <Label>Valor do kWh (R$)</Label>

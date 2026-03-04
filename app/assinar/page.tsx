@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { ReloadButton } from './reload-button'
+import { PixelCheckoutView, PixelPlanClick } from './pixel-checkout'
 
 export const metadata = { title: 'Assinar' }
 
@@ -9,7 +9,8 @@ function buildCheckoutUrl(base: string, email: string, name?: string | null) {
   const params = new URLSearchParams()
   params.set('email', email)
   if (name) params.set('name', name)
-  return `${base}?${params.toString()}`
+  const url = base.replace(/\/+$/, '') + '/checkout-payment'
+  return `${url}?${params.toString()}`
 }
 
 const features = [
@@ -74,6 +75,8 @@ export default async function AssinarPage() {
           <ReloadButton />
         </div>
 
+        <PixelCheckoutView />
+
         {/* Plans grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Anual — destaque */}
@@ -132,13 +135,14 @@ export default async function AssinarPage() {
                 </div>
               ))}
             </div>
-            <Link
+            <PixelPlanClick
+              plan="Plano Anual"
+              value={290}
               href={annualUrl}
-              target="_blank"
               className="block w-full text-center py-4 rounded-[13px] font-extrabold text-[15px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"
             >
               &rarr; Assinar anual e economizar
-            </Link>
+            </PixelPlanClick>
           </div>
 
           {/* Mensal */}
@@ -180,13 +184,14 @@ export default async function AssinarPage() {
                 </div>
               ))}
             </div>
-            <Link
+            <PixelPlanClick
+              plan="Plano Mensal"
+              value={29}
               href={monthlyUrl}
-              target="_blank"
               className="block w-full text-center py-4 rounded-[13px] font-extrabold text-[15px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"
             >
               &rarr; Assinar com garantia de 7 dias
-            </Link>
+            </PixelPlanClick>
           </div>
         </div>
 

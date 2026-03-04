@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, DM_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { MetaPixel } from "@/components/meta-pixel";
 import "./globals.css";
 
 const inter = Inter({
@@ -72,6 +73,7 @@ export default function RootLayout({
         className={`${inter.variable} ${dmMono.variable} font-sans antialiased`}
       >
         {children}
+        <MetaPixel />
         <Analytics />
       </body>
     </html>

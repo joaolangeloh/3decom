@@ -19,7 +19,6 @@ export interface MarketplaceConfig {
   type: 'none' | 'mercadolivre' | 'shopee'
   // ML
   mlAdType?: 'classico' | 'premium'
-  mlParcelamento?: boolean // installments — only for premium, adds 2.99% anticipation fee
   mlCategory?: string
   mlCustomRate?: number // manual rate for "Outra categoria"
   // Shopee
@@ -70,6 +69,11 @@ export interface CalculationInput {
   printMinutes: number
   kwhPrice: number
 
+  // Multiple pieces per plate (3D only)
+  piecesOnPlate: number // 1 = single piece (default)
+  dividePrintTime: boolean // divide print time by piecesOnPlate
+  divideFilament: boolean // divide filament by piecesOnPlate
+
   // Filament (3D only)
   filamentPricePerKg: number
   filamentWeightGrams: number
@@ -118,7 +122,6 @@ export interface CalculationResult {
   marketplaceCommission: number
   marketplaceFixedFee: number
   marketplaceCpfSurcharge: number
-  marketplaceAnticipationFee: number
   marketplaceTotalFee: number
 
   // Shipping
@@ -218,19 +221,27 @@ export function calculate(input: CalculationInput): CalculationResult {
   // 5. Card fee (on sale price)
   const cardFee = salePrice * (input.payment.cardRatePercent / 100)
 
-  // 6. Energy (3D only)
+  // 6. Energy (3D only) — divide by pieces on plate if enabled
   let energyCost = 0
   let printTimeHours = 0
+  const pieces = Math.max(1, input.piecesOnPlate || 1)
   if (input.productType === '3d') {
     const printer = PRINTERS.find((p) => p.id === input.printerId)
     const printerKw = input.printerId === 'custom' ? input.customPrinterKw : (printer?.avgKw || 0.08)
-    printTimeHours = input.printHours + input.printMinutes / 60
+    const totalPrintTimeHours = input.printHours + input.printMinutes / 60
+    printTimeHours = input.dividePrintTime && pieces > 1
+      ? totalPrintTimeHours / pieces
+      : totalPrintTimeHours
     energyCost = printerKw * printTimeHours * input.kwhPrice
   }
 
-  // 7. Filament (3D only)
+  // 7. Filament (3D only) — divide by pieces on plate if enabled
+  let filamentGrams = input.filamentWeightGrams
+  if (input.productType === '3d' && input.divideFilament && pieces > 1) {
+    filamentGrams = filamentGrams / pieces
+  }
   const filamentCost = input.productType === '3d'
-    ? (input.filamentPricePerKg / 1000) * input.filamentWeightGrams
+    ? (input.filamentPricePerKg / 1000) * filamentGrams
     : 0
 
   // 7b. Supplier cost (normal product only)
@@ -304,7 +315,6 @@ export function calculate(input: CalculationInput): CalculationResult {
     marketplaceCommission: round2(mkp.commission),
     marketplaceFixedFee: round2(mkp.fixedFee),
     marketplaceCpfSurcharge: round2(mkp.cpfSurcharge),
-    marketplaceAnticipationFee: round2(mkp.anticipationFee),
     marketplaceTotalFee: round2(mkp.totalFee),
     shippingCost: round2(shippingCost),
     shippingDescription,
@@ -338,12 +348,18 @@ function calculateSalePriceFromMargin(input: CalculationInput): number {
   let filamentCost = 0
   let supplierCost = 0
 
+  const pcs = Math.max(1, input.piecesOnPlate || 1)
   if (input.productType === '3d') {
     const printer = PRINTERS.find((p) => p.id === input.printerId)
     const printerKw = input.printerId === 'custom' ? input.customPrinterKw : (printer?.avgKw || 0.08)
-    const printTimeHours = input.printHours + input.printMinutes / 60
+    const totalPrintTimeHours = input.printHours + input.printMinutes / 60
+    const printTimeHours = input.dividePrintTime && pcs > 1
+      ? totalPrintTimeHours / pcs
+      : totalPrintTimeHours
     energyCost = printerKw * printTimeHours * input.kwhPrice
-    filamentCost = (input.filamentPricePerKg / 1000) * input.filamentWeightGrams
+    let filamentGrams = input.filamentWeightGrams
+    if (input.divideFilament && pcs > 1) filamentGrams = filamentGrams / pcs
+    filamentCost = (input.filamentPricePerKg / 1000) * filamentGrams
   } else {
     supplierCost = input.supplierCost || 0
   }
@@ -370,7 +386,6 @@ function calculateSalePriceFromMargin(input: CalculationInput): number {
     const rate = input.marketplace.mlCustomRate ??
       (cat ? cat[adType] : adType === 'classico' ? 11.5 : 16.5)
     deductionRate += rate / 100
-    if (input.marketplace.mlParcelamento) deductionRate += 0.0299
   } else if (input.marketplace.type === 'shopee') {
     // Estimate 20% for <R$80, 14% for higher — start with 20% as conservative
     deductionRate += 0.20
@@ -507,7 +522,6 @@ interface MarketplaceFeeResult {
   commission: number
   fixedFee: number
   cpfSurcharge: number
-  anticipationFee: number
   totalFee: number
 }
 
@@ -515,7 +529,7 @@ function calculateMarketplaceFees(
   salePrice: number,
   marketplace: MarketplaceConfig
 ): MarketplaceFeeResult {
-  const zero = { commissionPercent: 0, commission: 0, fixedFee: 0, cpfSurcharge: 0, anticipationFee: 0, totalFee: 0 }
+  const zero = { commissionPercent: 0, commission: 0, fixedFee: 0, cpfSurcharge: 0, totalFee: 0 }
   if (marketplace.type === 'none' || salePrice <= 0) return zero
 
   if (marketplace.type === 'mercadolivre') {
@@ -527,15 +541,13 @@ function calculateMarketplaceFees(
 
     const commission = salePrice * (commissionPercent / 100)
     const fixedFee = getMLFixedFee(salePrice)
-    const anticipationFee = marketplace.mlParcelamento ? salePrice * 0.0299 : 0
 
     return {
       commissionPercent,
       commission,
       fixedFee,
       cpfSurcharge: 0,
-      anticipationFee,
-      totalFee: commission + fixedFee + anticipationFee,
+      totalFee: commission + fixedFee,
     }
   }
 
@@ -556,7 +568,6 @@ function calculateMarketplaceFees(
     commission,
     fixedFee,
     cpfSurcharge,
-    anticipationFee: 0,
     totalFee: commission + fixedFee + cpfSurcharge,
   }
 }
@@ -581,7 +592,6 @@ function emptyResult(): CalculationResult {
     marketplaceCommission: 0,
     marketplaceFixedFee: 0,
     marketplaceCpfSurcharge: 0,
-    marketplaceAnticipationFee: 0,
     marketplaceTotalFee: 0,
     shippingCost: 0,
     shippingDescription: '',

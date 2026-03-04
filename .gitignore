@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.mcp.json
+*ml-refresh-token*
+ml-new-token.sh

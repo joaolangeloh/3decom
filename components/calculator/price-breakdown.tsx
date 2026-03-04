@@ -319,14 +319,6 @@ export function PriceBreakdown({
                     </span>
                   </div>
                 )}
-                {result.marketplaceAnticipationFee > 0 && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Antecipação parcelamento</span>
-                    <span className="font-mono">
-                      R$ {formatBRL(result.marketplaceAnticipationFee)}
-                    </span>
-                  </div>
-                )}
                 {result.marketplaceCpfSurcharge > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">

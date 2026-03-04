@@ -36,7 +36,7 @@ export async function GET() {
           ? 'Convidado'
           : subscription?.plan === 'annual'
             ? 'Anual'
-            : subscription
+            : subscription?.plan === 'monthly'
               ? 'Mensal'
               : 'Convidado',
       createdAt: profile.created_at,
