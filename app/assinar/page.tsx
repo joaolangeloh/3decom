@@ -204,6 +204,14 @@ export default async function AssinarPage() {
           <p className="text-center text-xs text-[#555578]">
             Após o pagamento, sua assinatura será ativada automaticamente
           </p>
+          <form action="/auth/signout" method="POST">
+            <button
+              type="submit"
+              className="text-xs text-[#555578] hover:text-white transition-colors font-mono mt-2"
+            >
+              Sair da conta
+            </button>
+          </form>
         </div>
       </div>
     </div>

@@ -32,12 +32,13 @@ export default function CadastroPage() {
     fbq('track', 'Lead', { content_name: 'Cadastro' })
   }, [])
 
-  // Track CompleteRegistration when form submits successfully
+  // Track CompleteRegistration when magic link is sent
+  // (password signup redirects server-side, so passState never reaches success on client)
   useEffect(() => {
-    if ((magicState && magicState.success) || (passState && !passState.error)) {
+    if (magicState?.success) {
       fbq('track', 'CompleteRegistration', { content_name: 'Cadastro' })
     }
-  }, [magicState, passState])
+  }, [magicState])
 
   useEffect(() => {
     if (magicState?.success) {

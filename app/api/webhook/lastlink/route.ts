@@ -31,6 +31,53 @@ const DEACTIVATE_EVENTS = new Set([
   'product_access_ended',
 ])
 
+async function findOrCreateUser(email: string, name: string): Promise<string | null> {
+  // 1. Check if profile already exists
+  const { data: profile } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .single()
+
+  if (profile) return profile.id
+
+  // 2. No profile — invite user (creates auth user + sends magic link email)
+  //    The DB trigger handle_new_user automatically creates profile + subscription
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
+
+  const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/calculadora`,
+    data: { name },
+  })
+
+  if (inviteData?.user) {
+    console.log(`Lastlink webhook: created new user via invite for ${email}`)
+    return inviteData.user.id
+  }
+
+  // 3. Invite failed (user exists in auth but trigger may have failed) — fallback
+  if (inviteError) {
+    console.log(`Lastlink webhook: invite error for ${email}: ${inviteError.message}`)
+
+    const { data: listData } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+    const authUser = listData?.users?.find(u => u.email?.toLowerCase() === email)
+
+    if (authUser) {
+      // Ensure profile exists (upsert in case trigger failed)
+      await supabaseAdmin.from('profiles').upsert({
+        id: authUser.id,
+        email,
+        name: name || (authUser.user_metadata?.name as string) || '',
+      })
+
+      console.log(`Lastlink webhook: found existing auth user for ${email}`)
+      return authUser.id
+    }
+  }
+
+  return null
+}
+
 export async function POST(req: Request) {
   const body: LastlinkWebhook = await req.json()
 
@@ -62,6 +109,7 @@ export async function POST(req: Request) {
     body.Data?.Member?.Email ??
     ''
   ).toLowerCase()
+  const buyerName = body.Data?.Buyer?.Name ?? ''
   const subscriptionId = body.Data?.Subscriptions?.Id ?? ''
 
   if (!email) {
@@ -74,20 +122,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, note: 'test event' })
   }
 
-  // Find profile by email
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('id')
-    .eq('email', email)
-    .single()
-
-  if (!profile) {
-    return NextResponse.json({
-      ok: true,
-      note: 'user not found, will activate when they register',
-    })
-  }
-
   // Determine status
   let status: string
   if (ACTIVATE_EVENTS.has(event)) {
@@ -98,6 +132,14 @@ export async function POST(req: Request) {
     // Unknown event — log but don't change status
     console.log(`Lastlink unknown event: ${event}`)
     return NextResponse.json({ ok: true, note: `unhandled event: ${event}` })
+  }
+
+  // Find or create user
+  const userId = await findOrCreateUser(email, buyerName)
+
+  if (!userId) {
+    console.log(`Lastlink webhook: could not find or create user for ${email}`)
+    return NextResponse.json({ error: 'Could not process user' }, { status: 500 })
   }
 
   // Determine plan by Offer ID
@@ -118,11 +160,11 @@ export async function POST(req: Request) {
   const { data: existing } = await supabaseAdmin
     .from('subscriptions')
     .select('id')
-    .eq('user_id', profile.id)
+    .eq('user_id', userId)
     .single()
 
   if (existing) {
-    await supabaseAdmin
+    const { error: updateError } = await supabaseAdmin
       .from('subscriptions')
       .update({
         status,
@@ -131,15 +173,25 @@ export async function POST(req: Request) {
         current_period_end: currentPeriodEnd,
         updated_at: new Date().toISOString(),
       })
-      .eq('user_id', profile.id)
+      .eq('user_id', userId)
+
+    if (updateError) {
+      console.error('Lastlink webhook: subscription update failed:', updateError)
+      return NextResponse.json({ error: 'DB update failed' }, { status: 500 })
+    }
   } else if (status === 'active') {
-    await supabaseAdmin.from('subscriptions').insert({
-      user_id: profile.id,
+    const { error: insertError } = await supabaseAdmin.from('subscriptions').insert({
+      user_id: userId,
       status,
       plan,
       lastlink_subscription_id: subscriptionId,
       current_period_end: currentPeriodEnd,
     })
+
+    if (insertError) {
+      console.error('Lastlink webhook: subscription insert failed:', insertError)
+      return NextResponse.json({ error: 'DB insert failed' }, { status: 500 })
+    }
   }
 
   return NextResponse.json({ ok: true, status })

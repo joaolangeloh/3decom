@@ -26,8 +26,9 @@ export async function updateSession(request: NextRequest) {
   )
 
   // PKCE flow: exchange code for session and redirect to clean URL
+  // Skip for /auth/callback — that route handler does its own code exchange
   const code = request.nextUrl.searchParams.get('code')
-  if (code) {
+  if (code && request.nextUrl.pathname !== '/auth/callback') {
     await supabase.auth.exchangeCodeForSession(code)
     const cleanUrl = request.nextUrl.clone()
     cleanUrl.searchParams.delete('code')
@@ -62,7 +63,9 @@ export async function updateSession(request: NextRequest) {
 
   // Logged in user on auth pages -> redirect to calculadora
   // Exception: /auth/redefinir-senha (user needs to set new password after recovery)
-  if (user && isAuthRoute && request.nextUrl.pathname !== '/auth/redefinir-senha') {
+  if (user && isAuthRoute
+    && request.nextUrl.pathname !== '/auth/redefinir-senha'
+    && request.nextUrl.pathname !== '/auth/callback') {
     const url = request.nextUrl.clone()
     url.pathname = '/calculadora'
     return NextResponse.redirect(url)
