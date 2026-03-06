@@ -42,3 +42,30 @@ export async function signup(prevState: unknown, formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/auth/confirmar-email')
 }
+
+export async function signupWithMagicLink(prevState: unknown, formData: FormData) {
+  const supabase = await createClient()
+
+  const name = formData.get('name') as string
+  const email = formData.get('email') as string
+
+  if (!name || !email) {
+    return { error: 'Preencha todos os campos.', success: false }
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      data: { name },
+      emailRedirectTo: `${siteUrl}/assinar`,
+    },
+  })
+
+  if (error) {
+    return { error: error.message, success: false }
+  }
+
+  return { success: true }
+}

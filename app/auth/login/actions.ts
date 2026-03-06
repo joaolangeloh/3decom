@@ -21,3 +21,28 @@ export async function login(prevState: unknown, formData: FormData) {
   revalidatePath('/', 'layout')
   redirect('/calculadora')
 }
+
+export async function loginWithMagicLink(prevState: unknown, formData: FormData) {
+  const supabase = await createClient()
+
+  const email = formData.get('email') as string
+
+  if (!email) {
+    return { error: 'Preencha o email.', success: false }
+  }
+
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${siteUrl}/calculadora`,
+    },
+  })
+
+  if (error) {
+    return { error: error.message, success: false }
+  }
+
+  return { success: true }
+}
