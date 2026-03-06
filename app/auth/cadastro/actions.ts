@@ -31,7 +31,7 @@ export async function signup(prevState: unknown, formData: FormData) {
     password,
     options: {
       data: { name },
-      emailRedirectTo: `${siteUrl}/assinar`,
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/assinar`,
     },
   })
 
@@ -59,7 +59,7 @@ export async function signupWithMagicLink(prevState: unknown, formData: FormData
     email,
     options: {
       data: { name },
-      emailRedirectTo: `${siteUrl}/assinar`,
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/assinar`,
     },
   })
 

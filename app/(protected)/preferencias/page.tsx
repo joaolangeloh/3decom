@@ -1,7 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useActionState } from 'react'
 import { loadPrefs, savePrefs, DEFAULT_PREFS, type Preferences } from '@/lib/preferences'
+import { changePassword } from './actions'
 import { PRINTERS, CUSTOM_PRINTER_ID } from '@/lib/printers'
 import { Card, CardContent } from '@/components/ui/card'
 import { DecimalInput } from '@/components/ui/decimal-input'
@@ -14,7 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Save, Check, RotateCcw } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Save, Check, RotateCcw, KeyRound } from 'lucide-react'
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -28,11 +31,23 @@ export default function PreferenciasPage() {
   const [prefs, setPrefs] = useState<Preferences>(DEFAULT_PREFS)
   const [mounted, setMounted] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [pwState, pwAction, pwPending] = useActionState(changePassword, null)
+  const [pwSaved, setPwSaved] = useState(false)
+  const pwFormRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     setPrefs(loadPrefs())
     setMounted(true)
   }, [])
+
+  useEffect(() => {
+    if (pwState?.success) {
+      setPwSaved(true)
+      pwFormRef.current?.reset()
+      const t = setTimeout(() => setPwSaved(false), 3000)
+      return () => clearTimeout(t)
+    }
+  }, [pwState])
 
   function handleSave() {
     savePrefs(prefs)
@@ -274,6 +289,65 @@ export default function PreferenciasPage() {
                 </button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Card 7: Senha */}
+        <Card className="border-border">
+          <CardContent className="pt-6">
+            <SectionTitle title="Senha" />
+            <p className="text-xs text-muted-foreground mb-4">
+              Defina ou altere sua senha de acesso. Se você entrou com link mágico, pode criar uma senha aqui.
+            </p>
+            <form ref={pwFormRef} action={pwAction} className="space-y-4">
+              {pwState?.error && (
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                  {pwState.error}
+                </div>
+              )}
+              {pwSaved && (
+                <div className="rounded-md bg-accent/10 p-3 text-sm text-accent flex items-center gap-2">
+                  <Check className="size-4" />
+                  Senha salva com sucesso!
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-xs text-muted-foreground">
+                    Nova senha
+                  </Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="Mínimo 6 caracteres"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword" className="text-xs text-muted-foreground">
+                    Confirmar senha
+                  </Label>
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="Repita a senha"
+                    required
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                variant="outline"
+                size="sm"
+                disabled={pwPending || pwSaved}
+                className="rounded-lg"
+              >
+                <KeyRound className="size-4" />
+                {pwPending ? 'Salvando...' : 'Salvar senha'}
+              </Button>
+            </form>
           </CardContent>
         </Card>
 
