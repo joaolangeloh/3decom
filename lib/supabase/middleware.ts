@@ -66,7 +66,7 @@ export async function updateSession(request: NextRequest) {
   if (user && isAuthRoute
     && request.nextUrl.pathname !== '/auth/redefinir-senha'
     && request.nextUrl.pathname !== '/auth/callback'
-    && request.nextUrl.pathname !== '/auth/token') {
+    && request.nextUrl.pathname !== '/auth/confirm') {
     const url = request.nextUrl.clone()
     url.pathname = '/calculadora'
     return NextResponse.redirect(url)

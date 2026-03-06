@@ -2,7 +2,6 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-// Fallback for old email links that still point here
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
@@ -16,7 +15,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
-      redirectTo.pathname = type === 'recovery' ? '/auth/redefinir-senha' : '/assinar'
+      // recovery → redefinir senha, tudo resto → calculadora (middleware redireciona pra /assinar se não tiver subscription)
+      redirectTo.pathname = type === 'recovery' ? '/auth/redefinir-senha' : '/calculadora'
       return NextResponse.redirect(redirectTo)
     }
   }
