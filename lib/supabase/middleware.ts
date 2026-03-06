@@ -65,7 +65,8 @@ export async function updateSession(request: NextRequest) {
   // Exception: /auth/redefinir-senha (user needs to set new password after recovery)
   if (user && isAuthRoute
     && request.nextUrl.pathname !== '/auth/redefinir-senha'
-    && request.nextUrl.pathname !== '/auth/callback') {
+    && request.nextUrl.pathname !== '/auth/callback'
+    && request.nextUrl.pathname !== '/auth/token') {
     const url = request.nextUrl.clone()
     url.pathname = '/calculadora'
     return NextResponse.redirect(url)

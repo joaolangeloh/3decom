@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 // Lastlink webhook payload (based on official docs)
@@ -43,13 +44,20 @@ async function findOrCreateUser(email: string, name: string): Promise<string | n
 
   // 2. No profile — send magic link (creates auth user if needed + sends login email)
   //    The DB trigger handle_new_user automatically creates profile + subscription
+  //    Uses implicit flow (not PKCE) so the magic link works without a code_verifier in the user's browser
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
 
-  const { error: otpError } = await supabaseAdmin.auth.signInWithOtp({
+  const implicitClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { flowType: 'implicit', autoRefreshToken: false, persistSession: false } }
+  )
+
+  const { error: otpError } = await implicitClient.auth.signInWithOtp({
     email,
     options: {
       data: { name },
-      emailRedirectTo: `${siteUrl}/auth/callback?next=/calculadora`,
+      emailRedirectTo: `${siteUrl}/auth/token`,
     },
   })
 
