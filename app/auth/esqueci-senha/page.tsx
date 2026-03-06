@@ -47,6 +47,33 @@ export default function EsqueciSenhaPage() {
                 </p>
               </div>
             </div>
+            <div className="flex gap-3">
+              <a
+                href="https://mail.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button variant="outline" className="w-full gap-2">
+                  <svg viewBox="0 0 24 24" className="size-4" fill="currentColor"><path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/></svg>
+                  Gmail
+                </Button>
+              </a>
+              <a
+                href="https://outlook.live.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button variant="outline" className="w-full gap-2">
+                  <svg viewBox="0 0 24 24" className="size-4" fill="currentColor"><path d="M24 7.387v10.478c0 .23-.08.424-.238.576a.806.806 0 0 1-.588.236h-8.174v-8.47l1.6 1.18 .4.27a.4.4 0 0 0 .5-.01l6.5-4.76v.5zM15 11.105V9.207l-.4-.27-1.6-1.14V18.677h11V8.387l-6.2 4.538a2.4 2.4 0 0 1-2.8.18zM9.6 2.4 0 4.8v14.4l9.6 2.4V2.4zM6.2 15.66c-.4.47-.88.7-1.45.7-.55 0-1-.24-1.35-.7-.35-.47-.53-1.1-.53-1.87v-.38c0-.8.17-1.44.52-1.92.35-.48.82-.72 1.4-.72.57 0 1.03.22 1.41.65.37.43.56 1.03.56 1.78v.55c0 .76-.18 1.38-.55 1.86zm-.83-3.46c-.17-.3-.42-.45-.74-.45-.33 0-.58.15-.75.46-.17.31-.26.74-.26 1.3v.5c0 .57.09 1.01.26 1.32.18.31.43.47.76.47s.58-.15.74-.45c.16-.3.24-.73.24-1.3v-.45c0-.6-.08-1.07-.25-1.4zM24 5.387c0-.23-.08-.42-.238-.57a.806.806 0 0 0-.588-.23H15c-.23 0-.424.077-.576.23a.782.782 0 0 0-.236.57v1.82l5 3.66 4.812-3.52V5.387z"/></svg>
+                  Outlook
+                </Button>
+              </a>
+            </div>
+            <div className="bg-secondary/50 rounded-lg p-3 text-xs text-muted-foreground font-mono">
+              Não encontrou? Verifique a caixa de spam.
+            </div>
             <div className="text-center">
               <Link
                 href="/auth/login"

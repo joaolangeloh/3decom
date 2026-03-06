@@ -41,38 +41,47 @@ async function findOrCreateUser(email: string, name: string): Promise<string | n
 
   if (profile) return profile.id
 
-  // 2. No profile — invite user (creates auth user + sends magic link email)
+  // 2. No profile — send magic link (creates auth user if needed + sends login email)
   //    The DB trigger handle_new_user automatically creates profile + subscription
   const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/+$/, '')
 
-  const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${siteUrl}/auth/callback?next=/calculadora`,
-    data: { name },
+  const { error: otpError } = await supabaseAdmin.auth.signInWithOtp({
+    email,
+    options: {
+      data: { name },
+      emailRedirectTo: `${siteUrl}/auth/callback?next=/calculadora`,
+    },
   })
 
-  if (inviteData?.user) {
-    console.log(`Lastlink webhook: created new user via invite for ${email}`)
-    return inviteData.user.id
+  if (otpError) {
+    console.log(`Lastlink webhook: magic link error for ${email}: ${otpError.message}`)
+    return null
   }
 
-  // 3. Invite failed (user exists in auth but trigger may have failed) — fallback
-  if (inviteError) {
-    console.log(`Lastlink webhook: invite error for ${email}: ${inviteError.message}`)
+  console.log(`Lastlink webhook: sent magic link for ${email}`)
 
-    const { data: listData } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
-    const authUser = listData?.users?.find(u => u.email?.toLowerCase() === email)
+  // Wait briefly for the trigger to create the profile, then fetch it
+  // signInWithOtp creates the user in auth.users, trigger creates the profile
+  const { data: newProfile } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('email', email)
+    .single()
 
-    if (authUser) {
-      // Ensure profile exists (upsert in case trigger failed)
-      await supabaseAdmin.from('profiles').upsert({
-        id: authUser.id,
-        email,
-        name: name || (authUser.user_metadata?.name as string) || '',
-      })
+  if (newProfile) return newProfile.id
 
-      console.log(`Lastlink webhook: found existing auth user for ${email}`)
-      return authUser.id
-    }
+  // Fallback: get user ID directly from auth if profile trigger was slow
+  const { data: listData } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+  const authUser = listData?.users?.find(u => u.email?.toLowerCase() === email)
+
+  if (authUser) {
+    // Ensure profile exists
+    await supabaseAdmin.from('profiles').upsert({
+      id: authUser.id,
+      email,
+      name: name || (authUser.user_metadata?.name as string) || '',
+    })
+    return authUser.id
   }
 
   return null
