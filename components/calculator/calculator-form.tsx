@@ -671,7 +671,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground">
-                        Frete estimado
+                        Custo de envio estimado
                       </Label>
                       <div className="mt-1 h-9 flex items-center px-3 rounded-md border border-border bg-secondary font-mono text-sm">
                         {result.shippingCost > 0
@@ -684,10 +684,10 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm">
-                          Oferecer frete rápido?
+                          Oferecer frete grátis
                         </p>
                         <p className="text-[10px] text-muted-foreground">
-                          Produtos R$19–78,99: custo maior, entrega mais rápida
+                          Custo adicional para entrega grátis
                         </p>
                       </div>
                       <Switch

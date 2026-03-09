@@ -1,6 +1,9 @@
-// Mercado Livre shipping costs (Envios ML) - March 2026
-// Source: Official ML table provided by user
+// Mercado Livre shipping/logistics costs (Envios ML) - March 2026
+// Source: https://www.mercadolivre.com.br/ajuda/40538
 // 29 weight rows × 8 price columns
+//
+// < R$79: cols 0-2 = taxa fixa (custo logístico). Frete rápido (FLEX) opcional.
+// >= R$79: cols 3-7 = frete grátis obrigatório (custo do vendedor).
 
 // Price column boundaries (exclusive upper bounds)
 // Col 0: R$0–18.99, Col 1: R$19–48.99, Col 2: R$49–78.99
@@ -45,8 +48,9 @@ const ML_FRETE_TABLE: FreteRow[] = [
   { maxKg: -1,   costs: [ 8.75, 12.95, 14.35,166.15,192.45,217.55,242.55,261.95] },
 ]
 
-// Frete rápido: optional faster shipping for products < R$79
-// Same values as col3 (R$79-99.99) of the main table
+// Frete rápido (FLEX): custo adicional para produtos < R$79
+// Valores = col3 (R$79-99.99) da tabela principal
+// Source: https://www.mercadolivre.com.br/ajuda/40538
 // prettier-ignore
 const ML_FRETE_RAPIDO: number[] = [
   12.35, 13.25, 13.85, 14.15, 14.45, 15.75, 17.05, 18.45,
@@ -76,17 +80,16 @@ function getPriceColumn(salePrice: number): number {
 
 export interface MLShippingResult {
   cost: number
-  type: 'padrao' | 'rapido' | 'manual'
+  type: 'padrao' | 'rapido'
   description: string
 }
 
 /**
- * Calculate ML shipping cost based on official March 2026 table
+ * Calculate ML shipping/logistics cost based on official March 2026 table.
  *
- * Rules:
- * - Product < R$19: col0, capped at 50% of product price
- * - Product R$19–78.99: col1/col2 (standard), or frete rápido (optional)
- * - Product ≥ R$79: col3–col7 based on price (frete rápido included)
+ * < R$79: taxa fixa (cols 0-2). Se freteRapido (FLEX), usa tabela FRETE_RAPIDO.
+ * >= R$79: frete grátis obrigatório (cols 3-7).
+ * < R$19: custo limitado a 50% do preço do produto.
  */
 export function calculateMLShipping(
   weightKg: number,
@@ -100,41 +103,48 @@ export function calculateMLShipping(
   const rowIndex = findWeightRowIndex(weightKg)
   const row = ML_FRETE_TABLE[rowIndex]
 
-  // Products < R$19: col0, capped at 50% of sale price
+  // Products < R$19: col0 (capped at 50% of price) or frete rápido
   if (salePrice < 19) {
+    if (freteRapido) {
+      return {
+        cost: ML_FRETE_RAPIDO[rowIndex],
+        type: 'rapido',
+        description: 'Frete rápido (Flex)',
+      }
+    }
     const baseCost = row.costs[0]
     const cost = Math.min(baseCost, salePrice * 0.5)
     return {
       cost,
       type: 'padrao',
       description: cost < baseCost
-        ? `Frete limitado a 50% do preço (R$${baseCost.toFixed(2).replace('.', ',')} → R$${cost.toFixed(2).replace('.', ',')})`
-        : 'Frete padrão',
+        ? `Taxa limitada a 50% do preço (R$${baseCost.toFixed(2).replace('.', ',')} → R$${cost.toFixed(2).replace('.', ',')})`
+        : 'Taxa fixa padrão',
     }
   }
 
-  // Products R$19–78.99: standard (col1/col2) or frete rápido (optional)
+  // Products R$19–78.99: taxa fixa (standard) or frete rápido (FLEX)
   if (salePrice < 79) {
     if (freteRapido) {
       return {
         cost: ML_FRETE_RAPIDO[rowIndex],
         type: 'rapido',
-        description: 'Frete grátis rápido (opcional)',
+        description: 'Frete rápido (Flex)',
       }
     }
     const col = getPriceColumn(salePrice)
     return {
       cost: row.costs[col],
       type: 'padrao',
-      description: 'Frete grátis padrão',
+      description: 'Taxa fixa padrão',
     }
   }
 
-  // Products ≥ R$79: use price-based column (frete rápido included automatically)
+  // Products >= R$79: frete grátis obrigatório
   const col = getPriceColumn(salePrice)
   return {
     cost: row.costs[col],
-    type: 'rapido',
-    description: 'Frete grátis rápido (automático)',
+    type: 'padrao',
+    description: 'Frete grátis obrigatório',
   }
 }

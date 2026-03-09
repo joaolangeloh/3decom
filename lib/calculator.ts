@@ -1,7 +1,6 @@
 import {
   ML_CATEGORIES,
   ML_DEFAULT_CATEGORY,
-  getMLFixedFee,
   getShopeeTier,
   getShopeeFixedFee,
   SHOPEE_COMMISSION_CAP,
@@ -190,6 +189,7 @@ export function calculate(input: CalculationInput): CalculationResult {
     shippingCost = input.manualShipping
     shippingDescription = 'Frete manual'
   } else if (input.marketplace.type === 'mercadolivre') {
+    // < R$79: taxa fixa (custo logístico). >= R$79: frete grátis obrigatório.
     const shipping = calculateMLShipping(
       input.shippingWeightKg,
       salePrice,
@@ -293,7 +293,10 @@ export function calculate(input: CalculationInput): CalculationResult {
   }
 
   if (mkp.totalFee > 0) addLine('Taxa marketplace', mkp.totalFee)
-  if (shippingCost > 0) addLine('Frete', shippingCost)
+  if (shippingCost > 0) addLine(
+    input.marketplace.type === 'mercadolivre' && salePrice < 79 ? 'Taxa fixa' : 'Frete',
+    shippingCost
+  )
   if (shopeeCouponCost > 0) addLine('Cupom proprio', shopeeCouponCost)
   if (taxAmount > 0) addLine('Imposto', taxAmount)
   if (cardFee > 0) addLine('Taxa cartao', cardFee)
@@ -402,13 +405,12 @@ function calculateSalePriceFromMargin(input: CalculationInput): number {
 
   let salePrice = baseCosts / denominator
 
-  // Add fixed fees (ML fixed fee, Shopee fixed fee + shipping)
+  // Add fixed costs (ML shipping/taxa fixa, Shopee fixed fee)
   if (input.marketplace.type === 'mercadolivre') {
-    const fixedFee = getMLFixedFee(salePrice)
-    const shipping = input.manualShipping ?? calculateMLShipping(
-      input.shippingWeightKg, salePrice, input.mlFreteRapido
-    ).cost
-    salePrice = (baseCosts + fixedFee + shipping) / denominator
+    // Taxa fixa / frete comes from the same shipping table
+    const shippingCost = input.manualShipping ??
+      calculateMLShipping(input.shippingWeightKg, salePrice, input.mlFreteRapido).cost
+    salePrice = (baseCosts + shippingCost) / denominator
   } else if (input.marketplace.type === 'shopee') {
     const tier = getShopeeTier(salePrice)
     const fixedFee = getShopeeFixedFee(salePrice, tier)
@@ -540,14 +542,13 @@ function calculateMarketplaceFees(
       (cat ? cat[adType] : adType === 'classico' ? 11.5 : 16.5)
 
     const commission = salePrice * (commissionPercent / 100)
-    const fixedFee = getMLFixedFee(salePrice)
-
+    // Taxa fixa / frete é calculada separadamente via calculateMLShipping
     return {
       commissionPercent,
       commission,
-      fixedFee,
+      fixedFee: 0,
       cpfSurcharge: 0,
-      totalFee: commission + fixedFee,
+      totalFee: commission,
     }
   }
 

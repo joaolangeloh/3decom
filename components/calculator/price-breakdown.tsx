@@ -332,7 +332,11 @@ export function PriceBreakdown({
                 {result.shippingCost > 0 && (
                   <div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Frete</span>
+                      <span className="text-muted-foreground">
+                        {marketplaceType === 'mercadolivre' && result.salePrice < 79
+                          ? 'Taxa fixa'
+                          : 'Frete'}
+                      </span>
                       <span className="font-mono">
                         R$ {formatBRL(result.shippingCost)}
                       </span>
