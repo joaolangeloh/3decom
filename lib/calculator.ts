@@ -149,6 +149,9 @@ export interface CalculationResult {
 
   // Shopee cupom
   shopeeCouponCost: number
+
+  // Break-even price (preço mínimo para lucro zero)
+  breakEvenPrice: number
 }
 
 // ============================================================
@@ -277,6 +280,15 @@ export function calculate(input: CalculationInput): CalculationResult {
   const marginPercent = salePrice > 0 ? (profit / salePrice) * 100 : 0
   const profitPerHour = printTimeHours > 0 ? profit / printTimeHours : 0
 
+  // Break-even: custos fixos / (1 - taxa percentual)
+  // Custos fixos = não dependem do preço de venda
+  const fixedCosts = shippingCost + energyCost + filamentCost + supplierCost +
+    packagingCost + otherCosts + laborCost + shopeeCouponCost + mkp.fixedFee + mkp.cpfSurcharge
+  // Taxa percentual = comissão + imposto + cartão (proporção do preço)
+  const percentRate = (mkp.commissionPercent + input.taxPercent + input.payment.cardRatePercent) / 100
+  const minPrice = input.marketplace.type !== 'none' ? 8 : 0
+  const breakEvenPrice = percentRate < 1 ? Math.max(minPrice, round2(fixedCosts / (1 - percentRate))) : minPrice
+
   // Capacity (assumes 20h printing/day, 30 days/month)
   const dailyProfit = profitPerHour * 20
   const monthlyProfit = dailyProfit * 30
@@ -336,6 +348,7 @@ export function calculate(input: CalculationInput): CalculationResult {
     dailyProfit: round2(dailyProfit),
     monthlyProfit: round2(monthlyProfit),
     shopeeCouponCost: round2(shopeeCouponCost),
+    breakEvenPrice,
   }
 }
 
@@ -611,5 +624,6 @@ function emptyResult(): CalculationResult {
     dailyProfit: 0,
     monthlyProfit: 0,
     shopeeCouponCost: 0,
+    breakEvenPrice: 0,
   }
 }

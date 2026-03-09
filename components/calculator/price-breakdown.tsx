@@ -227,7 +227,7 @@ export function PriceBreakdown({
                 reduza seus custos.
               </p>
               <p className="font-mono">
-                Preço mínimo (break-even): R$ {formatBRL(result.totalCosts)}
+                Preço mínimo (break-even): R$ {formatBRL(result.breakEvenPrice)}
               </p>
             </div>
           </div>
