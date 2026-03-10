@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { signout } from '@/app/auth/signout/actions'
 import { ReloadButton } from './reload-button'
 import { PixelCheckoutView, PixelPlanClick } from './pixel-checkout'
 
@@ -204,7 +205,7 @@ export default async function AssinarPage() {
           <p className="text-center text-xs text-[#555578]">
             Após o pagamento, sua assinatura será ativada automaticamente
           </p>
-          <form action="/auth/signout" method="POST">
+          <form action={signout}>
             <button
               type="submit"
               className="text-xs text-[#555578] hover:text-white transition-colors font-mono mt-2"
