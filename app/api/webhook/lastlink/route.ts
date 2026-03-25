@@ -23,6 +23,12 @@ const ACTIVATE_EVENTS = new Set([
   'product_access_started',
 ])
 
+const PAST_DUE_EVENTS = new Set([
+  'subscription_renewal_pending',
+  'payment_overdue',
+  'payment_failed',
+])
+
 const DEACTIVATE_EVENTS = new Set([
   'subscription_canceled',
   'subscription_expired',
@@ -134,6 +140,8 @@ export async function POST(req: Request) {
   let status: string
   if (ACTIVATE_EVENTS.has(event)) {
     status = 'active'
+  } else if (PAST_DUE_EVENTS.has(event)) {
+    status = 'past_due'
   } else if (DEACTIVATE_EVENTS.has(event)) {
     status = 'canceled'
   } else {

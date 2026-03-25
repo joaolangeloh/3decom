@@ -43,6 +43,8 @@ export default async function AssinarPage() {
 
   if (subscription?.status === 'active') redirect('/calculadora')
 
+  const isPastDue = subscription?.status === 'past_due'
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('name')
@@ -78,7 +80,25 @@ export default async function AssinarPage() {
 
         <PixelCheckoutView />
 
-        {/* Plans grid */}
+        {isPastDue ? (
+          <div className="rounded-2xl border border-[#ff3f5e]/30 bg-[#ff3f5e]/5 p-6 sm:p-8 text-center">
+            <p className="font-mono text-sm font-bold text-[#ff3f5e]">
+              Seu pagamento não foi processado
+            </p>
+            <p className="mt-2 font-mono text-xs text-[#b0b0cc]">
+              Regularize seu pagamento para continuar usando o 3DEcom.
+            </p>
+            <a
+              href={monthlyBase.replace(/\/+$/, '')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-block rounded-[13px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] px-8 py-4 font-extrabold text-[15px] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"
+            >
+              &rarr; Regularizar pagamento
+            </a>
+          </div>
+        ) : (
+        /* Plans grid */
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Anual — destaque */}
           <div className="bg-gradient-to-br from-[rgba(0,229,160,0.07)] to-[#13131f] border border-[rgba(0,229,160,0.3)] rounded-3xl p-5 sm:p-8 relative overflow-hidden transition-all hover:-translate-y-1 order-1">
@@ -195,6 +215,7 @@ export default async function AssinarPage() {
             </PixelPlanClick>
           </div>
         </div>
+        )}
 
         {/* Footer */}
         <div className="mt-6 flex flex-col items-center gap-3">
