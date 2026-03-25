@@ -37,7 +37,7 @@ export default async function AssinarPage() {
 
   const { data: subscription } = await supabase
     .from('subscriptions')
-    .select('status')
+    .select('status, plan')
     .eq('user_id', user.id)
     .single()
 
@@ -89,7 +89,7 @@ export default async function AssinarPage() {
               Regularize seu pagamento para continuar usando o 3DEcom.
             </p>
             <a
-              href={monthlyBase.replace(/\/+$/, '')}
+              href={subscription?.plan === 'annual' ? annualUrl : monthlyUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block rounded-[13px] bg-gradient-to-br from-[#00e5a0] to-[#00c87a] px-8 py-4 font-extrabold text-[15px] text-black transition-all hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,229,160,0.3)]"

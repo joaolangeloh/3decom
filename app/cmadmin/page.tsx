@@ -27,7 +27,7 @@ type User = {
   createdAt: string | null
 }
 
-type Filter = 'all' | 'activated' | 'not-activated' | 'subscribers' | 'inactive' | 'guests' | 'monthly' | 'annual'
+type Filter = 'all' | 'activated' | 'not-activated' | 'subscribers' | 'inactive' | 'past-due' | 'guests' | 'monthly' | 'annual'
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -83,8 +83,11 @@ export default function AdminPage() {
         break
       case 'inactive':
         result = result.filter(
-          (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active'
+          (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active' && u.subscriptionStatus !== 'past_due'
         )
+        break
+      case 'past-due':
+        result = result.filter((u) => u.subscriptionStatus === 'past_due')
         break
       case 'guests':
         result = result.filter((u) => u.planType === 'Convidado')
@@ -105,13 +108,14 @@ export default function AdminPage() {
     const activated = users.filter((u) => u.emailConfirmed).length
     const notActivated = total - activated
     const activeSubscriptions = users.filter((u) => u.subscriptionStatus === 'active').length
+    const pastDue = users.filter((u) => u.subscriptionStatus === 'past_due').length
     const inactiveSubscriptions = users.filter(
-      (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active'
+      (u) => u.subscriptionStatus && u.subscriptionStatus !== 'active' && u.subscriptionStatus !== 'past_due'
     ).length
     const guests = users.filter((u) => u.planType === 'Convidado').length
     const monthly = users.filter((u) => u.planType === 'Mensal').length
     const annual = users.filter((u) => u.planType === 'Anual').length
-    return { total, activated, notActivated, activeSubscriptions, inactiveSubscriptions, guests, monthly, annual }
+    return { total, activated, notActivated, activeSubscriptions, pastDue, inactiveSubscriptions, guests, monthly, annual }
   }, [users])
 
   function formatDate(date: string | null) {
@@ -190,6 +194,12 @@ export default function AdminPage() {
         </Card>
         <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
           <CardContent className="pt-4">
+            <p className="text-sm text-gray-400">Pendentes</p>
+            <p className="text-2xl font-bold text-orange-400">{stats.pastDue}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-[#1a1a2e] bg-[#0e0e1a]">
+          <CardContent className="pt-4">
             <p className="text-sm text-gray-400">Inativos</p>
             <p className="text-2xl font-bold text-yellow-400">{stats.inactiveSubscriptions}</p>
           </CardContent>
@@ -228,6 +238,7 @@ export default function AdminPage() {
             ['activated', 'Ativados'],
             ['not-activated', 'Não Ativados'],
             ['subscribers', 'Assinantes'],
+            ['past-due', 'Pendentes'],
             ['inactive', 'Inativos'],
             ['monthly', 'Mensais'],
             ['annual', 'Anuais'],
@@ -290,6 +301,10 @@ export default function AdminPage() {
                     {user.subscriptionStatus === 'active' ? (
                       <Badge className="bg-[#00e5a0]/20 text-[#00e5a0]">
                         Ativa
+                      </Badge>
+                    ) : user.subscriptionStatus === 'past_due' ? (
+                      <Badge variant="secondary" className="bg-orange-500/20 text-orange-400">
+                        Pendente
                       </Badge>
                     ) : user.subscriptionStatus ? (
                       <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-400">
