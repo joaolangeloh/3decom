@@ -20,8 +20,24 @@ import {
   Tag,
 } from 'lucide-react'
 
+type Currency = 'BRL' | 'USD' | 'EUR'
+
+const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  BRL: 'R$',
+  USD: 'US$',
+  EUR: '€',
+}
+
 function formatBRL(value: number): string {
   return value
+    .toFixed(2)
+    .replace('.', ',')
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+}
+
+function formatCurrency(value: number, currency: Currency, exchangeRate: number): string {
+  const converted = currency === 'BRL' ? value : value / exchangeRate
+  return converted
     .toFixed(2)
     .replace('.', ',')
     .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
@@ -43,8 +59,10 @@ interface PriceBreakdownProps {
   saving: boolean
   saved: boolean
   printTimeHours: number
-  marketplaceType: 'none' | 'mercadolivre' | 'shopee'
+  marketplaceType: 'none' | 'mercadolivre' | 'shopee' | 'amazon'
   editingName?: string | null
+  currency?: Currency
+  exchangeRate?: number
 }
 
 export function PriceBreakdown({
@@ -55,9 +73,14 @@ export function PriceBreakdown({
   printTimeHours,
   marketplaceType,
   editingName,
+  currency = 'BRL',
+  exchangeRate = 1,
 }: PriceBreakdownProps) {
   const [showNamePrompt, setShowNamePrompt] = useState(false)
   const [productName, setProductName] = useState(editingName ?? '')
+
+  const sym = CURRENCY_SYMBOLS[currency]
+  const fmt = (v: number) => formatCurrency(v, currency, exchangeRate)
 
   const isProfit = result.profit >= 0
   const hasData = result.salePrice > 0
@@ -99,7 +122,7 @@ export function PriceBreakdown({
                 Anunciar por
               </span>
               <span className="font-mono text-lg font-bold text-accent">
-                R$ {formatBRL(result.announcedPrice)}
+                {sym} {fmt(result.announcedPrice)}
               </span>
             </div>
             <div className="flex items-center justify-between mt-0.5">
@@ -107,7 +130,7 @@ export function PriceBreakdown({
                 Com desconto aplicado
               </span>
               <span className="font-mono text-sm">
-                R$ {formatBRL(result.salePrice)}
+                {sym} {fmt(result.salePrice)}
               </span>
             </div>
           </div>
@@ -119,7 +142,7 @@ export function PriceBreakdown({
             🏷️ Preço de venda
           </span>
           <span className="font-mono text-lg font-bold">
-            R$ {formatBRL(result.salePrice)}
+            {sym} {fmt(result.salePrice)}
           </span>
         </div>
 
@@ -137,7 +160,7 @@ export function PriceBreakdown({
                       {line.label}
                     </span>
                     <span className="font-mono text-sm text-destructive shrink-0">
-                      − R$ {formatBRL(line.value)}
+                      − {sym} {fmt(line.value)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between mt-0.5">
@@ -145,13 +168,33 @@ export function PriceBreakdown({
                       {line.percent.toFixed(1)}%
                     </span>
                     <span className="text-[10px] text-muted-foreground/60 font-mono">
-                      = R$ {formatBRL(line.remaining)}
+                      = {sym} {fmt(line.remaining)}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        <Separator />
+
+        {/* Cost summaries */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground font-semibold">Total de custos</span>
+            <span className="font-mono font-semibold text-destructive">
+              {sym} {fmt(result.totalCosts)}
+            </span>
+          </div>
+          {(result.energyCost > 0 || result.filamentCost > 0) && (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Energia + Filamento</span>
+              <span className="font-mono text-muted-foreground">
+                {sym} {fmt(result.energyCost + result.filamentCost)}
+              </span>
+            </div>
+          )}
         </div>
 
         <Separator />
@@ -175,7 +218,7 @@ export function PriceBreakdown({
                 isProfit ? 'text-accent' : 'text-destructive'
               }`}
             >
-              {isProfit ? 'Lucro líquido' : 'Prejuízo'}
+              {isProfit ? 'Lucro' : 'Prejuízo'}
             </span>
           </div>
           <div className="flex items-center justify-between">
@@ -184,7 +227,7 @@ export function PriceBreakdown({
                 isProfit ? 'text-accent' : 'text-destructive'
               }`}
             >
-              R$ {formatBRL(Math.abs(result.profit))}
+              {sym} {fmt(Math.abs(result.profit))}
             </span>
             <div className="flex items-center gap-2">
               <span
@@ -211,7 +254,7 @@ export function PriceBreakdown({
             <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
               <Clock className="size-3" />
               <span className="font-mono">
-                R$ {formatBRL(result.profitPerHour)}/hora
+                {sym} {fmt(result.profitPerHour)}/hora
               </span>
             </div>
           )}
@@ -227,7 +270,7 @@ export function PriceBreakdown({
                 reduza seus custos.
               </p>
               <p className="font-mono">
-                Preço mínimo (break-even): R$ {formatBRL(result.breakEvenPrice)}
+                Preço mínimo (break-even): {sym} {fmt(result.breakEvenPrice)}
               </p>
             </div>
           </div>
@@ -254,7 +297,7 @@ export function PriceBreakdown({
           <div className="bg-secondary/50 rounded-lg p-3 text-xs">
             <span className="text-muted-foreground">Preço no Pix: </span>
             <span className="font-mono font-semibold text-accent">
-              R$ {formatBRL(result.pixPrice)}
+              {sym} {fmt(result.pixPrice)}
             </span>
             <span className="text-muted-foreground">
               {' '}(−{result.pixDiscount.toFixed(0).replace('.', ',')}%)
@@ -277,7 +320,7 @@ export function PriceBreakdown({
                     Potencial diário (20h)
                   </span>
                   <span className="font-mono font-semibold">
-                    R$ {formatBRL(result.dailyProfit)}
+                    {sym} {fmt(result.dailyProfit)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -286,7 +329,7 @@ export function PriceBreakdown({
                     Potencial mensal (30d)
                   </span>
                   <span className="font-mono font-semibold text-accent">
-                    R$ {formatBRL(result.monthlyProfit)}
+                    {sym} {fmt(result.monthlyProfit)}
                   </span>
                 </div>
               </div>
@@ -300,7 +343,7 @@ export function PriceBreakdown({
             <Separator />
             <div>
               <p className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-                Detalhe {marketplaceType === 'mercadolivre' ? 'Mercado Livre' : 'Shopee'}
+                Detalhe {marketplaceType === 'mercadolivre' ? 'Mercado Livre' : marketplaceType === 'amazon' ? 'Amazon' : 'Shopee'}
               </p>
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
@@ -308,14 +351,16 @@ export function PriceBreakdown({
                     Comissão ({result.marketplaceCommissionPercent}%)
                   </span>
                   <span className="font-mono">
-                    R$ {formatBRL(result.marketplaceCommission)}
+                    {sym} {fmt(result.marketplaceCommission)}
                   </span>
                 </div>
                 {result.marketplaceFixedFee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Taxa fixa</span>
+                    <span className="text-muted-foreground">
+                      {marketplaceType === 'amazon' ? 'FBA/DBA + parcelamento' : 'Taxa fixa'}
+                    </span>
                     <span className="font-mono">
-                      R$ {formatBRL(result.marketplaceFixedFee)}
+                      {sym} {fmt(result.marketplaceFixedFee)}
                     </span>
                   </div>
                 )}
@@ -325,7 +370,7 @@ export function PriceBreakdown({
                       Adicional CPF
                     </span>
                     <span className="font-mono">
-                      R$ {formatBRL(result.marketplaceCpfSurcharge)}
+                      {sym} {fmt(result.marketplaceCpfSurcharge)}
                     </span>
                   </div>
                 )}
@@ -338,7 +383,7 @@ export function PriceBreakdown({
                           : 'Frete'}
                       </span>
                       <span className="font-mono">
-                        R$ {formatBRL(result.shippingCost)}
+                        {sym} {fmt(result.shippingCost)}
                       </span>
                     </div>
                     {result.shippingDescription && (
@@ -352,7 +397,7 @@ export function PriceBreakdown({
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Cupom próprio</span>
                     <span className="font-mono">
-                      R$ {formatBRL(result.shopeeCouponCost)}
+                      {sym} {fmt(result.shopeeCouponCost)}
                     </span>
                   </div>
                 )}

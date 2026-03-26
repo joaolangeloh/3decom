@@ -9,13 +9,21 @@ import {
 } from './marketplace-fees'
 import { calculateMLShipping } from './shipping'
 import { PRINTERS } from './printers'
+import {
+  AMAZON_3D_CATEGORIES,
+  getAmazonFBAFee,
+  getAmazonCommission,
+  getAmazonInstallmentFee,
+  AMAZON_DBA_SHIPPING_FEE,
+} from './calculator-3d-config'
+import type { AmazonFulfillmentType } from '@/types/calculator-3d'
 
 // ============================================================
 // Input types
 // ============================================================
 
 export interface MarketplaceConfig {
-  type: 'none' | 'mercadolivre' | 'shopee'
+  type: 'none' | 'mercadolivre' | 'shopee' | 'amazon'
   // ML
   mlAdType?: 'classico' | 'premium'
   mlCategory?: string
@@ -26,6 +34,10 @@ export interface MarketplaceConfig {
   shopeeCampaign?: boolean
   shopeeCouponType?: 'none' | 'percent' | 'fixed' // cupom proprio
   shopeeCouponValue?: number
+  // Amazon
+  amazonFulfillmentType?: AmazonFulfillmentType
+  amazonCategoryId?: string
+  amazonInstallmentsEnabled?: boolean
 }
 
 export interface PricingMode {
@@ -406,6 +418,10 @@ function calculateSalePriceFromMargin(input: CalculationInput): number {
     // Estimate 20% for <R$80, 14% for higher — start with 20% as conservative
     deductionRate += 0.20
     if (input.marketplace.shopeeCampaign) deductionRate += SHOPEE_CAMPAIGN_SURCHARGE / 100
+  } else if (input.marketplace.type === 'amazon') {
+    const catId = input.marketplace.amazonCategoryId || 'outros'
+    const cat = AMAZON_3D_CATEGORIES.find(c => c.id === catId)
+    deductionRate += (cat?.commissionPct ?? 15) / 100
   }
 
   // The margin is on the sale price: profit = salePrice * (margin/100)
@@ -444,6 +460,15 @@ function calculateSalePriceFromMargin(input: CalculationInput): number {
         salePrice = (baseCosts + newFixed + cpf) / newDenom
       }
     }
+  } else if (input.marketplace.type === 'amazon') {
+    const fbaFee = input.marketplace.amazonFulfillmentType === 'dba'
+      ? AMAZON_DBA_SHIPPING_FEE
+      : getAmazonFBAFee(salePrice)
+    const installmentFee = getAmazonInstallmentFee(
+      salePrice,
+      input.marketplace.amazonInstallmentsEnabled ?? false
+    )
+    salePrice = (baseCosts + fbaFee + installmentFee) / denominator
   }
 
   return Math.max(0, round2(salePrice))
@@ -562,6 +587,26 @@ function calculateMarketplaceFees(
       fixedFee: 0,
       cpfSurcharge: 0,
       totalFee: commission,
+    }
+  }
+
+  if (marketplace.type === 'amazon') {
+    const categoryId = marketplace.amazonCategoryId || 'outros'
+    const commission = getAmazonCommission(salePrice, categoryId)
+    const commissionPercent = (commission / salePrice) * 100
+    const fulfillment = marketplace.amazonFulfillmentType || 'fba'
+    const fbaFee = fulfillment === 'fba' ? getAmazonFBAFee(salePrice) : AMAZON_DBA_SHIPPING_FEE
+    const installmentFee = getAmazonInstallmentFee(
+      salePrice,
+      marketplace.amazonInstallmentsEnabled ?? false
+    )
+
+    return {
+      commissionPercent,
+      commission,
+      fixedFee: fbaFee + installmentFee,
+      cpfSurcharge: 0,
+      totalFee: commission + fbaFee + installmentFee,
     }
   }
 

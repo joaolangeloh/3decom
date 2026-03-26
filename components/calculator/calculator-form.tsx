@@ -29,7 +29,9 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
-import { ShoppingCart, Heart, Zap, Printer, Package } from 'lucide-react'
+import { ShoppingCart, Heart, Zap, Printer, Package, PackageCheck } from 'lucide-react'
+import { AmazonConfig3D } from './amazon-config-3d'
+import type { Amazon3DSettings } from '@/types/calculator-3d'
 
 // ============================================================
 // Section header
@@ -135,7 +137,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
 
   // Marketplace
   const [marketplaceType, setMarketplaceType] = useState<
-    'none' | 'mercadolivre' | 'shopee'
+    'none' | 'mercadolivre' | 'shopee' | 'amazon'
   >('mercadolivre')
   const [mlAdType, setMlAdType] = useState<'classico' | 'premium'>('classico')
   const [mlCategory, setMlCategory] = useState(ML_DEFAULT_CATEGORY)
@@ -149,6 +151,28 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     'none' | 'percent' | 'fixed'
   >('none')
   const [shopeeCouponValue, setShopeeCouponValue] = useState(0)
+
+  // Amazon
+  const [amazonFulfillmentType, setAmazonFulfillmentType] = useState<'fba' | 'dba'>('fba')
+  const [amazonCategoryId, setAmazonCategoryId] = useState('casa_cozinha')
+  const [amazonInstallmentsEnabled, setAmazonInstallmentsEnabled] = useState(false)
+
+  // Currency
+  const [currency, setCurrency] = useState<'BRL' | 'USD' | 'EUR'>('BRL')
+  const [exchangeRates, setExchangeRates] = useState({ USD: 5.50, EUR: 6.00 })
+
+  // Fetch live exchange rates
+  useEffect(() => {
+    fetch('https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL')
+      .then(res => res.json())
+      .then(data => {
+        setExchangeRates({
+          USD: parseFloat(data.USDBRL?.bid) || 5.50,
+          EUR: parseFloat(data.EURBRL?.bid) || 6.00,
+        })
+      })
+      .catch(() => {}) // keep defaults on error
+  }, [])
 
   // Shipping
   const [shippingWeightKg, setShippingWeightKg] = useState(0.3)
@@ -246,6 +270,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     setShopeeCampaign(mp?.shopeeCampaign ?? false)
     setShopeeCouponType(mp?.shopeeCouponType ?? 'none')
     setShopeeCouponValue(mp?.shopeeCouponValue ?? 0)
+    setAmazonFulfillmentType(mp?.amazonFulfillmentType ?? 'fba')
+    setAmazonCategoryId(mp?.amazonCategoryId ?? 'casa_cozinha')
+    setAmazonInstallmentsEnabled(mp?.amazonInstallmentsEnabled ?? false)
 
     // Shipping
     setShippingWeightKg(d.shippingWeightKg ?? 0.3)
@@ -312,6 +339,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
       shopeeCampaign,
       shopeeCouponType,
       shopeeCouponValue,
+      amazonFulfillmentType,
+      amazonCategoryId,
+      amazonInstallmentsEnabled,
     }),
     [
       marketplaceType,
@@ -324,6 +354,9 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
       shopeeCampaign,
       shopeeCouponType,
       shopeeCouponValue,
+      amazonFulfillmentType,
+      amazonCategoryId,
+      amazonInstallmentsEnabled,
     ]
   )
 
@@ -504,6 +537,36 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
       {/* Left Column - Form */}
       <div className="space-y-6">
+        {/* Currency selector */}
+        <Card className="border-border">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">Moeda de exibição</span>
+              <div className="flex gap-1">
+                {(['BRL', 'USD', 'EUR'] as const).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setCurrency(c)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
+                      currency === c
+                        ? 'bg-accent/10 border border-accent text-accent'
+                        : 'border border-border text-muted-foreground hover:border-accent/50'
+                    }`}
+                  >
+                    {c === 'BRL' ? 'R$' : c === 'USD' ? 'US$' : '€'}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {currency !== 'BRL' && (
+              <p className="text-[10px] text-muted-foreground font-mono mt-2">
+                Cotação: 1 {currency} = R$ {exchangeRates[currency].toFixed(2).replace('.', ',')}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Section 0: Product Type */}
         <Card className="border-border">
           <CardContent className="pt-6">
@@ -543,7 +606,7 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
         <Card className="border-border">
           <CardContent className="pt-6">
             <SectionHeader number={1} title="Marketplace" />
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
               <MarketplaceCard
                 selected={marketplaceType === 'mercadolivre'}
                 onClick={() => setMarketplaceType('mercadolivre')}
@@ -557,6 +620,13 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                 icon={<Heart className="size-5" />}
                 name="Shopee"
                 desc="Tabela oficial 2026"
+              />
+              <MarketplaceCard
+                selected={marketplaceType === 'amazon'}
+                onClick={() => setMarketplaceType('amazon')}
+                icon={<PackageCheck className="size-5" />}
+                name="Amazon"
+                desc="FBA ou DBA"
               />
               <MarketplaceCard
                 selected={marketplaceType === 'none'}
@@ -872,6 +942,22 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Amazon Options */}
+            {marketplaceType === 'amazon' && (
+              <AmazonConfig3D
+                settings={{
+                  fulfillmentType: amazonFulfillmentType,
+                  categoryId: amazonCategoryId,
+                  installmentsEnabled: amazonInstallmentsEnabled,
+                }}
+                onUpdate={(key, value) => {
+                  if (key === 'fulfillmentType') setAmazonFulfillmentType(value as 'fba' | 'dba')
+                  if (key === 'categoryId') setAmazonCategoryId(value as string)
+                  if (key === 'installmentsEnabled') setAmazonInstallmentsEnabled(value as boolean)
+                }}
+              />
             )}
           </CardContent>
         </Card>
@@ -1563,6 +1649,8 @@ export function CalculatorForm({ initialData }: CalculatorFormProps) {
           printTimeHours={printHours + printMinutes / 60}
           marketplaceType={marketplaceType}
           editingName={initialData?.name ?? null}
+          currency={currency}
+          exchangeRate={currency === 'BRL' ? 1 : exchangeRates[currency]}
         />
       </div>
     </div>
